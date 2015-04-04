@@ -36,28 +36,15 @@ public class ChannelSplitter {
             final Set<Map.Entry<ID, Chunk>> entries = aiff.getChunks().entrySet();
             for (Map.Entry<ID, Chunk> entry : entries) {
                 final Chunk chunk = entry.getValue();
+
                 if (chunk.getChunkID().equals(ChunkType.SOUND_DATA.getId())) {
-                    final SoundDataChunk soundDataChunk = new SoundDataChunk.Builder()
-                            .withChunkSize(SignedLong.fromInt(sampleData.length / numChannels))
-                            .withOffset(aiff.getSoundDataChunk().getOffset())
-                            .withBlockSize(aiff.getSoundDataChunk().getBlockSize())
-                            .withSampleData(bytesByChannel[i])
-                            .build();
-                    builder.withChunk(ChunkType.SOUND_DATA.getId(), soundDataChunk);
+                    SoundDataChunk soundChunk = modifySoundDataChunk(aiff, sampleData, bytesByChannel[i], numChannels);
+                    builder.withChunk(ChunkType.SOUND_DATA.getId(), soundChunk);
 
                 } else if (chunk.getChunkID().equals(ChunkType.COMMON.getId())) {
-                    final CommonChunk.Builder commonChunkBuilder = new CommonChunk.Builder()
-                            .withChunkSize(aiff.getCommonChunk().getChunkSize())
-                            .withNumChannels(SignedShort.fromShort((short) 1))
-                            .withNumSampleFrames(aiff.getCommonChunk().getNumSampleFrames())
-                            .withSampleSize(aiff.getCommonChunk().getSampleSize())
-                            .withSampleRate(aiff.getCommonChunk().getSampleRate());
-                    if (aiff.getCommonChunk().getCodec() != null) {
-                        commonChunkBuilder
-                                .withCodec(aiff.getCommonChunk().getCodec())
-                                .withDescription(aiff.getCommonChunk().getDescription());
-                    }
-                    builder.withChunk(ChunkType.COMMON.getId(), commonChunkBuilder.build());
+                    CommonChunk commonChunk = modifyCommonChunkToHaveOneChannel(aiff);
+                    builder.withChunk(ChunkType.COMMON.getId(), commonChunk);
+
                 } else {
                     builder.withChunk(chunk.getChunkID(), chunk);
                 }
@@ -66,6 +53,35 @@ public class ChannelSplitter {
             aiffs[i] = builder.build();
         }
         return aiffs;
+    }
+
+    private SoundDataChunk modifySoundDataChunk(Aiff aiff, byte[] sampleData, byte[] channelBytes, short numChannels) {
+        return new SoundDataChunk.Builder()
+                .withChunkSize(SignedLong.fromInt(sampleData.length / numChannels))
+                .withOffset(aiff.getSoundDataChunk().getOffset())
+                .withBlockSize(aiff.getSoundDataChunk().getBlockSize())
+                .withSampleData(channelBytes)
+                .build();
+    }
+
+    private CommonChunk modifyCommonChunkToHaveOneChannel(Aiff aiff) {
+
+        CommonChunk original = aiff.getCommonChunk();
+
+        final CommonChunk.Builder commonChunkBuilder = new CommonChunk.Builder()
+                .withChunkSize(original.getChunkSize())
+                .withNumChannels(SignedShort.fromShort((short) 1))
+                .withNumSampleFrames(original.getNumSampleFrames())
+                .withSampleSize(original.getSampleSize())
+                .withSampleRate(original.getSampleRate());
+
+        if (original.getCodec() != null) {
+            commonChunkBuilder
+                    .withCodec(original.getCodec())
+                    .withDescription(original.getDescription());
+        }
+
+        return commonChunkBuilder.build();
     }
 
     private byte[][] splitSampleDataByChannel(short numChannels, int bytesPerSample, byte[] sampleData) {
