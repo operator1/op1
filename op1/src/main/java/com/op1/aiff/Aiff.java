@@ -12,7 +12,7 @@ public class Aiff implements Chunk {
 
     private ID chunkId;
     private SignedLong chunkSize;
-    private ID format;
+    private ID formType;
 
     private Map<ID, Chunk> chunks = new LinkedHashMap<ID, Chunk>();
 
@@ -28,8 +28,8 @@ public class Aiff implements Chunk {
         return chunkSize;
     }
 
-    public ID getFormat() {
-        return format;
+    public ID getFormType() {
+        return formType;
     }
 
     public Map<ID, Chunk> getChunks() {
@@ -72,7 +72,7 @@ public class Aiff implements Chunk {
         }
 
         public Builder withFormat(ID format) {
-            instance.format = format;
+            instance.formType = format;
             return this;
         }
 

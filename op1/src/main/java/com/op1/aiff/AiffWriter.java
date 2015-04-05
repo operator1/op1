@@ -22,7 +22,7 @@ public class AiffWriter {
         // header
         writer.write(aiff.getChunkID());
         writer.write(aiff.getChunkSize());
-        writer.write(aiff.getFormat());
+        writer.write(aiff.getFormType());
 
         // chunks
         final Set<Map.Entry<ID, Chunk>> entries = aiff.getChunks().entrySet();

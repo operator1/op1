@@ -31,7 +31,7 @@ public class ChannelSplitter {
             final Aiff.Builder builder = new Aiff.Builder()
                     .withChunkId(aiff.getChunkID())
                     .withChunkSize(aiff.getChunkSize())
-                    .withFormat(aiff.getFormat());
+                    .withFormat(aiff.getFormType());
 
             final Set<Map.Entry<ID, Chunk>> entries = aiff.getChunks().entrySet();
             for (Map.Entry<ID, Chunk> entry : entries) {
