@@ -10,6 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.op1.aiff.ChunkType.COMMON;
+import static com.op1.aiff.ChunkType.SOUND_DATA;
+
 public class Aiff implements Chunk {
 
     private ID chunkId;
@@ -46,19 +49,23 @@ public class Aiff implements Chunk {
         return (CommonChunk) chunksMap.get(ChunkType.COMMON.getChunkId()).get(0);
     }
 
+    public boolean hasCommonChunk() {
+        return chunksMap.containsKey(ChunkType.COMMON.getChunkId());
+    }
+
     /**
      * Returns the Sound Data chunk or throws an IllegalStateException if there isn't one.
      * Use hasSoundDataChunk() to find out whether the chunk is available before calling this method.
      */
     public SoundDataChunk getSoundDataChunk() {
         if (hasSoundDataChunk()) {
-            return (SoundDataChunk) chunksMap.get(ChunkType.SOUND_DATA.getChunkId()).get(0);
+            return (SoundDataChunk) chunksMap.get(SOUND_DATA.getChunkId()).get(0);
         }
         throw new IllegalStateException("There is no SoundDataChunk");
     }
 
     public boolean hasSoundDataChunk() {
-        return chunksMap.containsKey(ChunkType.SOUND_DATA.getChunkId());
+        return chunksMap.containsKey(SOUND_DATA.getChunkId());
     }
 
     public static class Builder {
@@ -72,12 +79,21 @@ public class Aiff implements Chunk {
         public Aiff build() {
             Check.notNull(instance.chunkId, "Missing chunkId");
             Check.notNull(instance.chunkSize, "Missing chunkSize");
-            Check.that(instance.chunksMap.containsKey(ChunkType.COMMON.getChunkId()), "Missing common chunk");
-            Check.state(instance.chunksMap.get(ChunkType.COMMON.getChunkId()).size() == 1, "Must have exactly one common chunk");
-            // TODO: Sound data chunk is only required if there are >0 samples.
-            Check.that(instance.chunksMap.containsKey(ChunkType.SOUND_DATA.getChunkId()), "Missing sound data chunk");
-            Check.state(instance.chunksMap.get(ChunkType.SOUND_DATA.getChunkId()).size() <= 1, "Can have at most one sound data chunk");
+            Check.state(hasExactlyOneCommonChunk(), "Must have exactly one common chunk");
+            if (instance.getCommonChunk().getNumSampleFrames().toLong() > 0) {
+                Check.state(instance.hasSoundDataChunk(), "Missing sound data chunk");
+            }
+            // Note: we permit a superfluous sound data chunk when numSampleFrames is 0.
+            Check.state(hasZeroOrOneSoundDataChunks(), "Can have at most one sound data chunk");
             return instance;
+        }
+
+        private boolean hasZeroOrOneSoundDataChunks() {
+            return !instance.hasSoundDataChunk() || instance.chunksMap.get(SOUND_DATA.getChunkId()).size() == 1;
+        }
+
+        private boolean hasExactlyOneCommonChunk() {
+            return instance.hasCommonChunk() && instance.chunksMap.get(COMMON.getChunkId()).size() == 1;
         }
 
         public Builder withChunkId(ID chunkId) {

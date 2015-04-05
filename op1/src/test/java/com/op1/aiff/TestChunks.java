@@ -16,6 +16,16 @@ public class TestChunks {
                 .build();
     }
 
+    public static CommonChunk commonChunkZeroSampleFrames8BitMono() {
+        return new CommonChunk.Builder()
+                .withChunkSize(SignedLong.fromInt(18))
+                .withNumChannels(SignedShort.fromShort((short) 1))
+                .withNumSampleFrames(UnsignedLong.fromLong(0))
+                .withSampleSize(SignedShort.fromShort((short) 8))
+                .withSampleRate(new Extended(ByteBuffer.allocate(10).array()))
+                .build();
+    }
+
     public static SoundDataChunk soundDataChunkOneSampleFrame16BitMono() {
         return new SoundDataChunk.Builder()
                 .withChunkSize(SignedLong.fromInt(10))
