@@ -18,7 +18,7 @@ public class AiffReader {
         final Aiff.Builder builder = new Aiff.Builder()
                 .withChunkId(iffReader.readID())
                 .withChunkSize(iffReader.readSignedLong())
-                .withFormat(iffReader.readID());
+                .withFormType(iffReader.readID());
 
         readChunks(builder);
         return builder.build();

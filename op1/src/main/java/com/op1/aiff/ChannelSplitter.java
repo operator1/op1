@@ -6,6 +6,7 @@ import com.op1.iff.types.SignedLong;
 import com.op1.iff.types.SignedShort;
 import com.op1.util.Check;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,22 +32,23 @@ public class ChannelSplitter {
             final Aiff.Builder builder = new Aiff.Builder()
                     .withChunkId(aiff.getChunkID())
                     .withChunkSize(aiff.getChunkSize())
-                    .withFormat(aiff.getFormType());
+                    .withFormType(aiff.getFormType());
 
-            final Set<Map.Entry<ID, Chunk>> entries = aiff.getChunks().entrySet();
-            for (Map.Entry<ID, Chunk> entry : entries) {
-                final Chunk chunk = entry.getValue();
+            final Set<Map.Entry<ID, List<Chunk>>> entries = aiff.getChunksMap().entrySet();
+            for (Map.Entry<ID, List<Chunk>> entry : entries) {
+                final List<Chunk> chunks = entry.getValue();
+                for (Chunk chunk : chunks) {
+                    if (chunk.getChunkID().equals(ChunkType.SOUND_DATA.getChunkId())) {
+                        SoundDataChunk soundChunk = modifySoundDataChunk(aiff, sampleData, bytesByChannel[i], numChannels);
+                        builder.withChunk(ChunkType.SOUND_DATA.getChunkId(), soundChunk);
 
-                if (chunk.getChunkID().equals(ChunkType.SOUND_DATA.getId())) {
-                    SoundDataChunk soundChunk = modifySoundDataChunk(aiff, sampleData, bytesByChannel[i], numChannels);
-                    builder.withChunk(ChunkType.SOUND_DATA.getId(), soundChunk);
+                    } else if (chunk.getChunkID().equals(ChunkType.COMMON.getChunkId())) {
+                        CommonChunk commonChunk = modifyCommonChunkToHaveOneChannel(aiff);
+                        builder.withChunk(ChunkType.COMMON.getChunkId(), commonChunk);
 
-                } else if (chunk.getChunkID().equals(ChunkType.COMMON.getId())) {
-                    CommonChunk commonChunk = modifyCommonChunkToHaveOneChannel(aiff);
-                    builder.withChunk(ChunkType.COMMON.getId(), commonChunk);
-
-                } else {
-                    builder.withChunk(chunk.getChunkID(), chunk);
+                    } else {
+                        builder.withChunk(chunk.getChunkID(), chunk);
+                    }
                 }
             }
 

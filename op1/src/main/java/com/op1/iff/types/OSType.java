@@ -9,6 +9,10 @@ public class OSType extends DataType {
         super(bytes);
     }
 
+    public static OSType fromString(String s) {
+        return new OSType(s.getBytes());
+    }
+
     @Override
     public String toString() {
         return new String(bytes);

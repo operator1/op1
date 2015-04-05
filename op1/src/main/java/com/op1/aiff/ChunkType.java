@@ -3,6 +3,7 @@ package com.op1.aiff;
 import com.op1.iff.Chunk;
 import com.op1.iff.IffReader;
 import com.op1.iff.types.ID;
+import com.op1.util.Check;
 
 import java.io.IOException;
 
@@ -34,7 +35,7 @@ public enum ChunkType {
         this.chunkReader = chunkReader;
     }
 
-    public ID getId() {
+    public ID getChunkId() {
         return id;
     }
 
@@ -58,5 +59,11 @@ public enum ChunkType {
             }
         }
         return false;
+    }
+
+    public static boolean isChunkType(Chunk chunk, ChunkType chunkType) {
+        Check.notNull(chunk, "Chunk is null");
+        Check.notNull(chunkType, "ChunkType is null");
+        return chunk.getChunkID().equals(chunkType.getChunkId());
     }
 }

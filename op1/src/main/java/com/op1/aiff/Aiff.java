@@ -5,7 +5,9 @@ import com.op1.iff.types.ID;
 import com.op1.iff.types.SignedLong;
 import com.op1.util.Check;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Aiff implements Chunk {
@@ -14,7 +16,7 @@ public class Aiff implements Chunk {
     private SignedLong chunkSize;
     private ID formType;
 
-    private Map<ID, Chunk> chunks = new LinkedHashMap<ID, Chunk>();
+    private Map<ID, List<Chunk>> chunksMap = new LinkedHashMap<ID, List<Chunk>>();
 
     public Aiff() {
     }
@@ -32,16 +34,31 @@ public class Aiff implements Chunk {
         return formType;
     }
 
-    public Map<ID, Chunk> getChunks() {
-        return chunks;
+    public Map<ID, List<Chunk>> getChunksMap() {
+        return chunksMap;
+    }
+
+    public List<Chunk> getChunks(ID chunkId) {
+        return chunksMap.get(chunkId);
     }
 
     public CommonChunk getCommonChunk() {
-        return (CommonChunk) chunks.get(ChunkType.COMMON.getId());
+        return (CommonChunk) chunksMap.get(ChunkType.COMMON.getChunkId()).get(0);
     }
 
+    /**
+     * Returns the Sound Data chunk or throws an IllegalStateException if there isn't one.
+     * Use hasSoundDataChunk() to find out whether the chunk is available before calling this method.
+     */
     public SoundDataChunk getSoundDataChunk() {
-        return (SoundDataChunk) chunks.get(ChunkType.SOUND_DATA.getId());
+        if (hasSoundDataChunk()) {
+            return (SoundDataChunk) chunksMap.get(ChunkType.SOUND_DATA.getChunkId()).get(0);
+        }
+        throw new IllegalStateException("There is no SoundDataChunk");
+    }
+
+    public boolean hasSoundDataChunk() {
+        return chunksMap.containsKey(ChunkType.SOUND_DATA.getChunkId());
     }
 
     public static class Builder {
@@ -55,9 +72,9 @@ public class Aiff implements Chunk {
         public Aiff build() {
             Check.notNull(instance.chunkId, "Missing chunkId");
             Check.notNull(instance.chunkSize, "Missing chunkSize");
-            Check.that(instance.chunks.containsKey(ChunkType.COMMON.getId()), "Missing common chunk");
+            Check.that(instance.chunksMap.containsKey(ChunkType.COMMON.getChunkId()), "Missing common chunk");
             // TODO: Sound data chunk is only required if there are >0 samples.
-            Check.that(instance.chunks.containsKey(ChunkType.SOUND_DATA.getId()), "Missing sound data chunk");
+            Check.that(instance.chunksMap.containsKey(ChunkType.SOUND_DATA.getChunkId()), "Missing sound data chunk");
             return instance;
         }
 
@@ -71,13 +88,19 @@ public class Aiff implements Chunk {
             return this;
         }
 
-        public Builder withFormat(ID format) {
+        public Builder withFormType(ID format) {
             instance.formType = format;
             return this;
         }
 
         public Builder withChunk(ID chunkId, Chunk chunk) {
-            instance.chunks.put(chunkId, chunk);
+            // Guava's multimap would come in handy here, but resisting for the sake of having no dependencies.
+            List<Chunk> chunks = instance.chunksMap.get(chunkId);
+            if (chunks == null) {
+                chunks = new ArrayList<Chunk>();
+                instance.chunksMap.put(chunkId, chunks);
+            }
+            chunks.add(chunk);
             return this;
         }
     }

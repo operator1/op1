@@ -6,8 +6,11 @@ import com.op1.iff.types.ID;
 import com.op1.iff.types.SignedChar;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.op1.aiff.ChunkType.*;
 
 public class AiffWriter {
 
@@ -17,6 +20,7 @@ public class AiffWriter {
         this.writer = writer;
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void writeAiff(Aiff aiff) throws IOException {
 
         // header
@@ -25,21 +29,23 @@ public class AiffWriter {
         writer.write(aiff.getFormType());
 
         // chunks
-        final Set<Map.Entry<ID, Chunk>> entries = aiff.getChunks().entrySet();
-        for (Map.Entry<ID, Chunk> entry : entries) {
-            final Chunk chunk = entry.getValue();
-            if (chunk.getChunkID().equals(ChunkType.COMMON.getId())) {
-                writeCommonChunk((CommonChunk) chunk);
-            } else if (chunk.getChunkID().equals(ChunkType.SOUND_DATA.getId())) {
-                writeSoundDataChunk((SoundDataChunk) chunk);
-            } else if (chunk.getChunkID().equals(ChunkType.APPLICATION.getId())) {
-                writeApplicationChunk((ApplicationChunk) chunk);
-            } else if (chunk.getChunkID().equals(ChunkType.MARKER.getId())) {
-                writeMarkerChunk((MarkerChunk) chunk);
-            } else if (chunk.getChunkID().equals(ChunkType.INSTRUMENT.getId())) {
-                writeInstrumentChunk((InstrumentChunk) chunk);
-            } else {
-                writeUnknownChunk((UnknownChunk) chunk);
+        final Set<Map.Entry<ID, List<Chunk>>> entries = aiff.getChunksMap().entrySet();
+        for (Map.Entry<ID, List<Chunk>> entry : entries) {
+            final List<Chunk> chunks = entry.getValue();
+            for (Chunk chunk : chunks) {
+                if (isChunkType(chunk, COMMON)) {
+                    writeCommonChunk((CommonChunk) chunk);
+                } else if (isChunkType(chunk, SOUND_DATA)) {
+                    writeSoundDataChunk((SoundDataChunk) chunk);
+                } else if (isChunkType(chunk, APPLICATION)) {
+                    writeApplicationChunk((ApplicationChunk) chunk);
+                } else if (isChunkType(chunk, MARKER)) {
+                    writeMarkerChunk((MarkerChunk) chunk);
+                } else if (isChunkType(chunk, INSTRUMENT)) {
+                    writeInstrumentChunk((InstrumentChunk) chunk);
+                } else {
+                    writeUnknownChunk((UnknownChunk) chunk);
+                }
             }
         }
     }

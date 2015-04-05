@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class InstrumentChunk implements Chunk {
 
-    private final ID chunkId = ChunkType.INSTRUMENT.getId();
+    private final ID chunkId = ChunkType.INSTRUMENT.getChunkId();
 
     private SignedLong chunkSize;
     private SignedChar baseNote;

@@ -15,10 +15,10 @@ import java.util.List;
 
 public class ApplicationChunk implements Chunk {
 
-    private final ID chunkId = ChunkType.APPLICATION.getId();   // 4 bytes
-    private SignedLong chunkSize;                               // 4 bytes
-    private OSType applicationSignature;                        // 4 bytes
-    private SignedChar[] data;                                  // 2 bytes per item
+    private final ID chunkId = ChunkType.APPLICATION.getChunkId();  // 4 bytes
+    private SignedLong chunkSize;                                   // 4 bytes
+    private OSType applicationSignature;                            // 4 bytes
+    private SignedChar[] data;                                      // 2 bytes per item
 
     private ApplicationChunk() {
     }

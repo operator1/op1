@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class SoundDataChunk implements Chunk {
 
-    private final ID chunkId = ChunkType.SOUND_DATA.getId();
+    private final ID chunkId = ChunkType.SOUND_DATA.getChunkId();
 
     private SignedLong chunkSize;
     private UnsignedLong offset;

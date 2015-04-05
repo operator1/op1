@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MarkerChunk implements Chunk {
 
-    private final ID chunkId = ChunkType.MARKER.getId();
+    private final ID chunkId = ChunkType.MARKER.getChunkId();
     private SignedLong chunkSize;
     private UnsignedShort numMarkers;
     private List<Marker> markers = new ArrayList<Marker>();
