@@ -73,8 +73,10 @@ public class Aiff implements Chunk {
             Check.notNull(instance.chunkId, "Missing chunkId");
             Check.notNull(instance.chunkSize, "Missing chunkSize");
             Check.that(instance.chunksMap.containsKey(ChunkType.COMMON.getChunkId()), "Missing common chunk");
+            Check.state(instance.chunksMap.get(ChunkType.COMMON.getChunkId()).size() == 1, "Must have exactly one common chunk");
             // TODO: Sound data chunk is only required if there are >0 samples.
             Check.that(instance.chunksMap.containsKey(ChunkType.SOUND_DATA.getChunkId()), "Missing sound data chunk");
+            Check.state(instance.chunksMap.get(ChunkType.SOUND_DATA.getChunkId()).size() <= 1, "Can have at most one sound data chunk");
             return instance;
         }
 

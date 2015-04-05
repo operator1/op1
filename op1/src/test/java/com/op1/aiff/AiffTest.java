@@ -34,4 +34,23 @@ public class AiffTest {
         assertThat(aiff.getChunks(ChunkType.APPLICATION.getChunkId()), notNullValue());
         assertThat(aiff.getChunks(ChunkType.APPLICATION.getChunkId()).size(), equalTo(2));
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void cannotAddMultipleCommonChunks() throws Exception {
+
+        // given
+        CommonChunk commonChunk1 = TestChunks.commonChunkOneSampleFrame16BitMono();
+        CommonChunk commonChunk2 = TestChunks.commonChunkOneSampleFrame16BitMono();
+        SoundDataChunk soundDataChunk = TestChunks.soundDataChunkOneSampleFrame16BitMono();
+
+        // when
+        new Aiff.Builder()
+                .withChunkId(new ID("FORM".getBytes()))
+                .withChunkSize(SignedLong.fromInt(42))
+                .withFormType(new ID("AIFF".getBytes()))
+                .withChunk(ChunkType.COMMON.getChunkId(), commonChunk1)
+                .withChunk(ChunkType.COMMON.getChunkId(), commonChunk2)
+                .withChunk(ChunkType.SOUND_DATA.getChunkId(), soundDataChunk)
+                .build();
+    }
 }

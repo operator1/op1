@@ -17,9 +17,9 @@ public class Check {
         }
     }
 
-    public static void support(boolean b, String message) {
+    public static void state(boolean b, String message) {
         if (!b) {
-            throw new UnsupportedOperationException(message);
+            throw new IllegalStateException(message);
         }
     }
 }
