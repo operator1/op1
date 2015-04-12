@@ -26,4 +26,9 @@ public class UnsignedLong extends DataType {
     public static UnsignedLong fromLong(long someLong) {
         return new UnsignedLong(ByteBuffer.allocate(4).putInt((int) someLong).array());
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(toLong());
+    }
 }

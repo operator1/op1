@@ -18,4 +18,9 @@ public class SignedShort extends DataType {
     public static SignedShort fromShort(short s) {
         return new SignedShort(ByteBuffer.allocate(2).putShort(s).array());
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(toShort());
+    }
 }

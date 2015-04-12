@@ -117,6 +117,29 @@ public class DrumkitMeta {
         return lfoParams;
     }
 
+    @Override
+    public String toString() {
+        return "DrumkitMeta{" +
+                "drumVersion=" + drumVersion +
+                ", type='" + type + '\'' +
+                ", name='" + name + '\'' +
+                ", octave=" + octave +
+                ", pitch=" + Arrays.toString(pitch) +
+                ", start=" + Arrays.toString(start) +
+                ", end=" + Arrays.toString(end) +
+                ", playmode=" + Arrays.toString(playmode) +
+                ", reverse=" + Arrays.toString(reverse) +
+                ", volume=" + Arrays.toString(volume) +
+                ", dynaEnv=" + Arrays.toString(dynaEnv) +
+                ", fxActive=" + fxActive +
+                ", fxType='" + fxType + '\'' +
+                ", fxParams=" + Arrays.toString(fxParams) +
+                ", lfoActive=" + lfoActive +
+                ", lfoType='" + lfoType + '\'' +
+                ", lfoParams=" + Arrays.toString(lfoParams) +
+                '}';
+    }
+
     public static class Builder {
 
         private final DrumkitMeta instance;
@@ -131,7 +154,7 @@ public class DrumkitMeta {
             Check.state(is24ElementArray(instance.end), "End is not a 24 element array");
             Check.state(is24ElementArray(instance.playmode), "Playmode is not a 24 element array");
             Check.state(is24ElementArray(instance.reverse), "Reverse is not a 24 element array");
-            Check.state(is24ElementArray(instance.volume), "Volumne is not a 24 element array");
+            Check.state(is24ElementArray(instance.volume), "Volume is not a 24 element array");
             Check.state(is8ElementArray(instance.dynaEnv), "DynaEnv is not an 8 element array");
             Check.state(is8ElementArray(instance.fxParams), "FxParams is not an 8 element array");
             Check.state(is8ElementArray(instance.lfoParams), "LfoParams is not an 8 element array");

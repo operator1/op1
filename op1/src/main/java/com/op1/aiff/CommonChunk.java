@@ -157,4 +157,18 @@ public class CommonChunk implements Chunk {
             return readCommonChunk(reader);
         }
     }
+
+    @Override
+    public String toString() {
+        return "CommonChunk{" +
+                "chunkId=" + chunkId +
+                ", chunkSize=" + chunkSize +
+                ", numChannels=" + numChannels +
+                ", numSampleFrames=" + numSampleFrames +
+                ", sampleSize=" + sampleSize +
+                ", sampleRate=" + sampleRate +
+                ", codec=" + codec +
+                ", description=" + (description == null ? null : new String(description)) +
+                '}';
+    }
 }

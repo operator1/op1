@@ -1,6 +1,18 @@
 package com.op1.drumkit;
 
+import com.op1.aiff.Aiff;
+import com.op1.aiff.AiffReader;
+import com.op1.aiff.ApplicationChunk;
+import com.op1.aiff.ChunkType;
+import com.op1.iff.Chunk;
+import com.op1.iff.IffReader;
+import com.op1.iff.types.SignedChar;
+import org.hamcrest.Matchers;
 import org.junit.Test;
+
+import java.io.DataInputStream;
+import java.io.InputStream;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -8,6 +20,8 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class DrumkitMetaTest {
+
+    private static final String DRUMKIT_FILE = "PO-12.aif";
 
     @Test
     public void canGetDrumkitMetaFromJson() throws Exception {
@@ -37,6 +51,30 @@ public class DrumkitMetaTest {
         assertThat(meta.isLfoActive(), is(false));
         assertThat(meta.getLfoType(), equalTo("tremolo"));
         assertIsArrayOfSize8(meta.getLfoParams());
+    }
+
+    @Test
+    public void canReadDrumkitMetaFromDrumkitFile() throws Exception {
+
+        // given
+        final InputStream inputStream = DrumkitMetaTest.class.getClassLoader().getResourceAsStream(DRUMKIT_FILE);
+        final DataInputStream dataInputStream = new DataInputStream(inputStream);
+        final IffReader iffReader = new IffReader(dataInputStream);
+        final AiffReader aiffReader = new AiffReader(iffReader);
+
+        // when
+        final Aiff aiff = aiffReader.readAiff();
+
+        // then
+        assertThat(aiff, notNullValue());
+        List<Chunk> chunks = aiff.getChunks(ChunkType.APPLICATION.getChunkId());
+        assertThat(chunks, Matchers.notNullValue());
+        assertThat(chunks.size(), equalTo(1));
+        ApplicationChunk chunk = (ApplicationChunk) chunks.get(0);
+        String json = SignedChar.getString(chunk.getData());
+        DrumkitMeta meta = DrumkitMeta.fromJson(json);
+        System.out.println(meta);
+        System.out.println(aiff.getCommonChunk());
     }
 
     private void assertIsArrayOfSize24(int[] array) {

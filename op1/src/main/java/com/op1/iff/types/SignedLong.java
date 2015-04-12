@@ -18,4 +18,9 @@ public class SignedLong extends DataType {
     public static SignedLong fromInt(int i) {
         return new SignedLong(ByteBuffer.allocate(4).putInt(i).array());
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(toInt());
+    }
 }
