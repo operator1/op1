@@ -5,7 +5,7 @@ import com.op1.iff.IffWriter;
 import com.op1.iff.types.ID;
 import com.op1.iff.types.SignedChar;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +18,13 @@ public class AiffWriter {
 
     public AiffWriter(IffWriter writer) {
         this.writer = writer;
+    }
+
+    public static AiffWriter newAiffWriter(File writeFile) throws FileNotFoundException {
+        final FileOutputStream fileOutputStream = new FileOutputStream(writeFile);
+        final DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+        final IffWriter iffWriter = new IffWriter(dataOutputStream);
+        return new AiffWriter(iffWriter);
     }
 
     @SuppressWarnings("ConstantConditions")

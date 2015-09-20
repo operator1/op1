@@ -3,7 +3,7 @@ package com.op1.aiff;
 import com.op1.iff.IffReader;
 import com.op1.iff.types.ID;
 
-import java.io.IOException;
+import java.io.*;
 
 public class AiffReader {
 
@@ -11,6 +11,13 @@ public class AiffReader {
 
     public AiffReader(IffReader iffReader) {
         this.iffReader = iffReader;
+    }
+
+    public static AiffReader newAiffReader(File file) throws FileNotFoundException {
+        final FileInputStream fileInputStream = new FileInputStream(file);
+        final DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+        final IffReader iffReader = new IffReader(dataInputStream);
+        return new AiffReader(iffReader);
     }
 
     public Aiff readAiff() throws IOException {
