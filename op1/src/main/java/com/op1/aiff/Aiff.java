@@ -24,7 +24,6 @@ public class Aiff implements Chunk {
     public Aiff() {
     }
 
-    @Override
     public ID getChunkID() {
         return chunkId;
     }

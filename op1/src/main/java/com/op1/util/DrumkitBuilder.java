@@ -78,7 +78,6 @@ public class DrumkitBuilder {
 
     private static class WavOrDirectoryFilter implements FileFilter {
 
-        @Override
         public boolean accept(File pathname) {
             return isReadableDirectory(pathname) || (isReadableWavFile(pathname) && isTwelveSecondsOrLess(pathname));
         }

@@ -31,7 +31,6 @@ public class SoundDataChunk implements Chunk {
         this.sampleData = chunk.getSampleData();
     }
 
-    @Override
     public ID getChunkID() {
         return chunkId;
     }
@@ -108,7 +107,6 @@ public class SoundDataChunk implements Chunk {
     }
 
     public static class SoundDataChunkReader implements ChunkReader {
-        @Override
         public Chunk readChunk(IffReader reader) throws IOException {
             return SoundDataChunk.readSoundDataChunk(reader);
         }

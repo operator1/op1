@@ -29,7 +29,6 @@ public class ApplicationChunk implements Chunk {
         this.data = Arrays.copyOf(chunk.getData(), chunk.getData().length);
     }
 
-    @Override
     public ID getChunkID() {
         return chunkId;
     }
@@ -97,7 +96,6 @@ public class ApplicationChunk implements Chunk {
     }
 
     public static class ApplicationChunkReader implements ChunkReader {
-        @Override
         public Chunk readChunk(IffReader reader) throws IOException {
             return readApplicationChunk(reader);
         }

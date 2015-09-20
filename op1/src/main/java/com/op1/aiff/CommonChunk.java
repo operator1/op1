@@ -38,7 +38,6 @@ public class CommonChunk implements Chunk {
         }
     }
 
-    @Override
     public ID getChunkID() {
         return chunkId;
     }
@@ -152,7 +151,6 @@ public class CommonChunk implements Chunk {
 
     public static class CommonChunkReader implements ChunkReader {
 
-        @Override
         public Chunk readChunk(IffReader reader) throws IOException {
             return readCommonChunk(reader);
         }

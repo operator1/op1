@@ -26,7 +26,6 @@ public class MarkerChunk implements Chunk {
         Collections.addAll(this.markers, chunk.getMarkers());
     }
 
-    @Override
     public ID getChunkID() {
         return chunkId;
     }
@@ -122,7 +121,6 @@ public class MarkerChunk implements Chunk {
     }
 
     public static class MarkerChunkReader implements ChunkReader {
-        @Override
         public Chunk readChunk(IffReader reader) throws IOException {
             return readMarkerChunk(reader);
         }

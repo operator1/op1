@@ -47,7 +47,6 @@ public class InstrumentChunk implements Chunk {
                 chunk.getReleaseLoop().getEndLoop());
     }
 
-    @Override
     public ID getChunkID() {
         return chunkId;
     }
@@ -213,7 +212,6 @@ public class InstrumentChunk implements Chunk {
     }
 
     public static class InstrumentChunkReader implements ChunkReader {
-        @Override
         public Chunk readChunk(IffReader reader) throws IOException {
             return readInstrumentChunk(reader);
         }

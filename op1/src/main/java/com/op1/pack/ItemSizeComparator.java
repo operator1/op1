@@ -4,7 +4,6 @@ import java.util.Comparator;
 
 public class ItemSizeComparator implements Comparator<Item> {
 
-    @Override
     public int compare(Item left, Item right) {
 
         if (left == null && right == null) {

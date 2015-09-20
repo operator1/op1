@@ -24,7 +24,6 @@ public class UnknownChunk implements Chunk {
         this.chunkData = Arrays.copyOf(chunk.getChunkData(), chunk.getChunkData().length);
     }
 
-    @Override
     public ID getChunkID() {
         return chunkId;
     }
