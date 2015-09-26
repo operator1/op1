@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 public class UnsignedShort extends DataType {
 
     public UnsignedShort(byte[] bytes) {
-        super(bytes);
+        super(bytes, 2);
     }
 
     public int toInt() {
