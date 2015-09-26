@@ -15,7 +15,8 @@ public class AiffReader {
 
     public static AiffReader newAiffReader(File file) throws FileNotFoundException {
         final FileInputStream fileInputStream = new FileInputStream(file);
-        final DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+        final BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
+        final DataInputStream dataInputStream = new DataInputStream(bufferedInputStream);
         final IffReader iffReader = new IffReader(dataInputStream);
         return new AiffReader(iffReader);
     }

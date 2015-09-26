@@ -5,7 +5,8 @@ import java.net.URL;
 
 public enum ExampleFile {
     ALBUM("Scrap30.aif"),
-    TAPE("track_1.aif");
+    TAPE("track_1.aif"),
+    DRUM("PO-12.aif");
 
     private final String classpathResource;
 

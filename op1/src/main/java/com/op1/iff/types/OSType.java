@@ -6,7 +6,7 @@ package com.op1.iff.types;
 public class OSType extends DataType {
 
     public OSType(byte[] bytes) {
-        super(bytes);
+        super(bytes, 4);
     }
 
     public static OSType fromString(String s) {

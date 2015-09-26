@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 public class SignedShort extends DataType {
 
     public SignedShort(byte[] bytes) {
-        super(bytes);
+        super(bytes, 2);
     }
 
     public short toShort() {

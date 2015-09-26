@@ -22,7 +22,8 @@ public class AiffWriter {
 
     public static AiffWriter newAiffWriter(File writeFile) throws FileNotFoundException {
         final FileOutputStream fileOutputStream = new FileOutputStream(writeFile);
-        final DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+        final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+        final DataOutputStream dataOutputStream = new DataOutputStream(bufferedOutputStream);
         final IffWriter iffWriter = new IffWriter(dataOutputStream);
         return new AiffWriter(iffWriter);
     }

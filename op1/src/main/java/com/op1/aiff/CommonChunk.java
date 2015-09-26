@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class CommonChunk implements Chunk {
 
-    private final ID chunkId = ChunkType.COMMON.getChunkId();       // 4 bytes
+    private final ID chunkId = ChunkType.COMMON.getChunkId();   // 4 bytes
     private SignedLong chunkSize;                               // 4 bytes
 
     private SignedShort numChannels;                            // 2 bytes

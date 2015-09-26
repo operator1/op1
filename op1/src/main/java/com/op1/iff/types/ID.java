@@ -10,7 +10,7 @@ public class ID extends DataType {
     private final String name;
 
     public ID(byte[] bytes) {
-        super(bytes);
+        super(bytes, 4);
         this.name = new String(bytes);
     }
 

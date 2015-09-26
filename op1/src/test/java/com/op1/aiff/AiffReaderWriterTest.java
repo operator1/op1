@@ -20,6 +20,16 @@ public class AiffReaderWriterTest {
         doReadWriteTest(ExampleFile.ALBUM.getFile());
     }
 
+    @Test
+    public void read_and_write_tape_file_produces_same_file() throws Exception {
+        doReadWriteTest(ExampleFile.TAPE.getFile());
+    }
+
+    @Test
+    public void read_and_write_drum_file_produces_same_file() throws Exception {
+        doReadWriteTest(ExampleFile.DRUM.getFile());
+    }
+
     private void doReadWriteTest(File readFile) throws IOException {
 
         // given
@@ -28,8 +38,7 @@ public class AiffReaderWriterTest {
         final AiffWriter aiffWriter = AiffWriter.newAiffWriter(writeFile);
 
         // when
-        final Aiff aiff = aiffReader.readAiff();
-        aiffWriter.writeAiff(aiff);
+        aiffWriter.writeAiff(aiffReader.readAiff());
 
         // then
         assertTrue(writeFile.exists());

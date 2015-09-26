@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 public class SignedLong extends DataType {
 
     public SignedLong(byte[] bytes) {
-        super(bytes);
+        super(bytes, 4);
     }
 
     public int toInt() {
