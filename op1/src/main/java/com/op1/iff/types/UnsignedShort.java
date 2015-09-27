@@ -18,4 +18,9 @@ public class UnsignedShort extends DataType {
         System.arraycopy(bytes, 0, bufferBytes, 2, bytes.length);
         return ByteBuffer.wrap(bufferBytes).getInt();
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(toInt());
+    }
 }

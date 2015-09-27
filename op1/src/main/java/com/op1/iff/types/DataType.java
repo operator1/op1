@@ -20,4 +20,8 @@ public abstract class DataType {
     public byte[] toByteArray() {
         return Arrays.copyOf(bytes, bytes.length);
     }
+
+    public int getSize() {
+        return bytes.length;
+    }
 }

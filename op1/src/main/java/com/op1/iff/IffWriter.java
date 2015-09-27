@@ -2,10 +2,11 @@ package com.op1.iff;
 
 import com.op1.iff.types.*;
 
+import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class IffWriter {
+public class IffWriter implements Closeable {
 
     private final DataOutputStream dataOutputStream;
 
@@ -55,5 +56,13 @@ public class IffWriter {
 
     public void write(byte[] bytes) throws IOException {
         this.dataOutputStream.write(bytes);
+    }
+
+    public void flush() throws IOException {
+        this.dataOutputStream.flush();
+    }
+
+    public void close() throws IOException {
+        this.dataOutputStream.close();
     }
 }

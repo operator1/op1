@@ -28,6 +28,22 @@ public class Aiff implements Chunk {
         return chunkId;
     }
 
+    @Override
+    public int getSize() {
+
+        int size = chunkId.getSize()
+                + chunkSize.getSize()
+                + formType.getSize();
+
+        for (List<Chunk> chunks : chunksMap.values()) {
+            for (Chunk chunk : chunks) {
+                size += chunk.getSize();
+            }
+        }
+
+        return size;
+    }
+
     public SignedLong getChunkSize() {
         return chunkSize;
     }
@@ -65,6 +81,16 @@ public class Aiff implements Chunk {
 
     public boolean hasSoundDataChunk() {
         return chunksMap.containsKey(SOUND_DATA.getChunkId());
+    }
+
+    @Override
+    public String toString() {
+        return "Aiff{" +
+                "chunkId=" + chunkId +
+                ", chunkSize=" + chunkSize +
+                ", formType=" + formType +
+                ", chunksMap=" + chunksMap +
+                '}';
     }
 
     public static class Builder {

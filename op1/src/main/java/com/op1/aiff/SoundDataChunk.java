@@ -6,8 +6,11 @@ import com.op1.iff.types.ID;
 import com.op1.iff.types.SignedLong;
 import com.op1.iff.types.UnsignedLong;
 import com.op1.util.Check;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class SoundDataChunk implements Chunk {
 
@@ -21,6 +24,8 @@ public class SoundDataChunk implements Chunk {
     // It does, however, expose a security hole in the getSampleData() method.
     private byte[] sampleData;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SoundDataChunk.class);
+
     private SoundDataChunk() {
     }
 
@@ -29,6 +34,27 @@ public class SoundDataChunk implements Chunk {
         this.offset = chunk.getOffset();
         this.blockSize = chunk.getBlockSize();
         this.sampleData = chunk.getSampleData();
+        LOGGER.debug(chunk.toString());
+    }
+
+    @Override
+    public int getSize() {
+        return chunkId.getSize()
+                + chunkSize.getSize()
+                + offset.getSize()
+                + blockSize.getSize()
+                + sampleData.length;
+    }
+
+    @Override
+    public String toString() {
+        return "SoundDataChunk{" +
+                "chunkId=" + chunkId +
+                ", chunkSize=" + chunkSize +
+                ", offset=" + offset +
+                ", blockSize=" + blockSize +
+                ", sampleData is " + sampleData.length + " bytes" +
+                '}';
     }
 
     public ID getChunkID() {

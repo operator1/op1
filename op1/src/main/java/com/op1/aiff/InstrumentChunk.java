@@ -4,6 +4,8 @@ import com.op1.iff.Chunk;
 import com.op1.iff.IffReader;
 import com.op1.iff.types.*;
 import com.op1.util.Check;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -21,6 +23,8 @@ public class InstrumentChunk implements Chunk {
     private SignedShort gain;
     private Loop sustainLoop;
     private Loop releaseLoop;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(InstrumentChunk.class);
 
     private InstrumentChunk() {
     }
@@ -45,6 +49,25 @@ public class InstrumentChunk implements Chunk {
                 chunk.getReleaseLoop().getPlayMode(),
                 chunk.getReleaseLoop().getBeginLoop(),
                 chunk.getReleaseLoop().getEndLoop());
+
+        LOGGER.debug(this.toString());
+    }
+
+    @Override
+    public String toString() {
+        return "InstrumentChunk{" +
+                "chunkId=" + chunkId +
+                ", chunkSize=" + chunkSize +
+                ", baseNote=" + baseNote +
+                ", detune=" + detune +
+                ", lowNote=" + lowNote +
+                ", highNote=" + highNote +
+                ", lowVelocity=" + lowVelocity +
+                ", highVelocity=" + highVelocity +
+                ", gain=" + gain +
+                ", sustainLoop=" + sustainLoop +
+                ", releaseLoop=" + releaseLoop +
+                '}';
     }
 
     public ID getChunkID() {
@@ -114,6 +137,36 @@ public class InstrumentChunk implements Chunk {
         public SignedShort getEndLoop() {
             return endLoop;
         }
+
+        public int getSize() {
+            return playMode.getSize()
+                    + beginLoop.getSize()
+                    + endLoop.getSize();
+        }
+
+        @Override
+        public String toString() {
+            return "Loop{" +
+                    "playMode=" + playMode +
+                    ", beginLoop=" + beginLoop +
+                    ", endLoop=" + endLoop +
+                    '}';
+        }
+    }
+
+    @Override
+    public int getSize() {
+        return chunkId.getSize()
+                + chunkSize.getSize()
+                + baseNote.getSize()
+                + detune.getSize()
+                + lowNote.getSize()
+                + highNote.getSize()
+                + lowVelocity.getSize()
+                + highVelocity.getSize()
+                + gain.getSize()
+                + sustainLoop.getSize()
+                + releaseLoop.getSize();
     }
 
     public static class Builder {

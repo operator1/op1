@@ -24,6 +24,13 @@ public class UnknownChunk implements Chunk {
         this.chunkData = Arrays.copyOf(chunk.getChunkData(), chunk.getChunkData().length);
     }
 
+    @Override
+    public int getSize() {
+        return chunkId.getSize()
+                + chunkSize.getSize()
+                + chunkData.length;
+    }
+
     public ID getChunkID() {
         return chunkId;
     }

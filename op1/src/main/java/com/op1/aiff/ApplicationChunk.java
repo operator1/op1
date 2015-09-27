@@ -7,6 +7,8 @@ import com.op1.iff.types.OSType;
 import com.op1.iff.types.SignedChar;
 import com.op1.iff.types.SignedLong;
 import com.op1.util.Check;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ public class ApplicationChunk implements Chunk {
     private OSType applicationSignature;                            // 4 bytes
     private SignedChar[] data;                                      // 2 bytes per item
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationChunk.class);
+
     private ApplicationChunk() {
     }
 
@@ -27,6 +31,31 @@ public class ApplicationChunk implements Chunk {
         this.chunkSize = chunk.getChunkSize();
         this.applicationSignature = chunk.getApplicationSignature();
         this.data = Arrays.copyOf(chunk.getData(), chunk.getData().length);
+        LOGGER.debug(this.toString()); // TODO: allowing this to escape
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationChunk{" +
+                "chunkId=" + chunkId +
+                ", chunkSize=" + chunkSize +
+                ", applicationSignature=" + applicationSignature +
+                ", data is " + data.length + " bytes" +
+                '}';
+    }
+
+    @Override
+    public int getSize() {
+
+        int size = chunkId.getSize()
+                + chunkSize.getSize()
+                + applicationSignature.getSize();
+
+        for (SignedChar signedChar : data) {
+            size += signedChar.getSize();
+        }
+
+        return size;
     }
 
     public ID getChunkID() {
@@ -82,9 +111,14 @@ public class ApplicationChunk implements Chunk {
         OSType applicationSignature = reader.readOSType();
 
         int numCharsToRead = (chunkSize.toInt() - 4);
-        List<SignedChar> data = new ArrayList<SignedChar>();
+        List<SignedChar> data = new ArrayList<>();
         for (int i = 0; i < numCharsToRead; i++) {
-            data.add(reader.readSignedChar());
+            try {
+                data.add(reader.readSignedChar());
+            } catch (IOException e) {
+                LOGGER.error("Had problems reading application chunk's data on i == " + i, e);
+                throw e;
+            }
         }
         final SignedChar[] dataArray = data.toArray(new SignedChar[data.size()]);
 

@@ -23,4 +23,8 @@ public class SignedChar extends DataType {
         return String.valueOf(chars);
     }
 
+    public String toString() {
+        return String.valueOf((short) toByteArray()[0]);
+    }
+
 }

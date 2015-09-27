@@ -2,11 +2,12 @@ package com.op1.iff;
 
 import com.op1.iff.types.*;
 
+import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 
-public class IffReader {
+public class IffReader implements Closeable {
 
     private final DataInputStream dataInputStream;
 
@@ -75,12 +76,16 @@ public class IffReader {
         final byte[] bytes = new byte[numBytesToRead];
         final int numRead = dataInputStream.read(bytes);
         if (numRead != numBytesToRead) {
-            throw new EOFException();
+            throw new EOFException(String.format("numBytesToRead: %s, numRead: %s", numBytesToRead, numRead));
         }
         return bytes;
     }
 
     public byte readByte() throws IOException {
         return dataInputStream.readByte();
+    }
+
+    public void close() throws IOException {
+        dataInputStream.close();
     }
 }

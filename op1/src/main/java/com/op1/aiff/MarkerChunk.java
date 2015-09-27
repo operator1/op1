@@ -4,6 +4,8 @@ import com.op1.iff.Chunk;
 import com.op1.iff.IffReader;
 import com.op1.iff.types.*;
 import com.op1.util.Check;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +17,9 @@ public class MarkerChunk implements Chunk {
     private final ID chunkId = ChunkType.MARKER.getChunkId();
     private SignedLong chunkSize;
     private UnsignedShort numMarkers;
-    private List<Marker> markers = new ArrayList<Marker>();
+    private List<Marker> markers = new ArrayList<>();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MarkerChunk.class);
 
     private MarkerChunk() {
     }
@@ -24,6 +28,31 @@ public class MarkerChunk implements Chunk {
         this.chunkSize = chunk.getChunkSize();
         this.numMarkers = chunk.getNumMarkers();
         Collections.addAll(this.markers, chunk.getMarkers());
+        LOGGER.debug(this.toString());
+    }
+
+    @Override
+    public String toString() {
+        return "MarkerChunk{" +
+                "chunkId=" + chunkId +
+                ", chunkSize=" + chunkSize +
+                ", numMarkers=" + numMarkers +
+                ", markers=" + markers +
+                '}';
+    }
+
+    @Override
+    public int getSize() {
+
+        int size = chunkId.getSize()
+                + chunkSize.getSize()
+                + numMarkers.getSize();
+
+        for (Marker marker : markers) {
+            size += marker.getSize();
+        }
+
+        return size;
     }
 
     public ID getChunkID() {
@@ -57,6 +86,12 @@ public class MarkerChunk implements Chunk {
             this.markerName = markerName;
         }
 
+        public int getSize() {
+            return markerId.getSize()
+                    + position.getSize()
+                    + markerName.getSize();
+        }
+
         public SignedShort getMarkerId() {
             return markerId;
         }
@@ -67,6 +102,15 @@ public class MarkerChunk implements Chunk {
 
         public PString getMarkerName() {
             return markerName;
+        }
+
+        @Override
+        public String toString() {
+            return "Marker{" +
+                    "markerId=" + markerId +
+                    ", position=" + position +
+                    ", markerName=" + markerName +
+                    '}';
         }
     }
 

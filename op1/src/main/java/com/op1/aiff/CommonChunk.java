@@ -4,8 +4,13 @@ import com.op1.iff.Chunk;
 import com.op1.iff.IffReader;
 import com.op1.iff.types.*;
 import com.op1.util.Check;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.text.normalizer.UTF16;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Optional;
 
 public class CommonChunk implements Chunk {
 
@@ -18,8 +23,31 @@ public class CommonChunk implements Chunk {
     private Extended sampleRate;                                // 10 bytes
 
     // These two seem to be optional
-    private ID codec;                                           // 4 bytes
-    private byte[] description;                                 // the rest
+    private Optional<ID> codec = Optional.empty();              // 4 bytes
+    private Optional<byte[]> description = Optional.empty();    // the rest
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonChunk.class);
+
+    @Override
+    public int getSize() {
+
+        int size = chunkId.getSize()
+                + chunkSize.getSize()
+                + numChannels.getSize()
+                + numSampleFrames.getSize()
+                + sampleSize.getSize()
+                + sampleRate.getSize();
+
+        if (codec.isPresent()) {
+            size += codec.get().getSize();
+        }
+
+        if (description.isPresent()) {
+            size += description.get().length;
+        }
+
+        return size;
+    }
 
     private CommonChunk() {
     }
@@ -30,12 +58,14 @@ public class CommonChunk implements Chunk {
         this.numSampleFrames = DataTypes.copyOf(chunk.getNumSampleFrames());
         this.sampleSize = DataTypes.copyOf(chunk.getSampleSize());
         this.sampleRate = DataTypes.copyOf(chunk.getSampleRate());
-        if (chunk.getCodec() != null) {
-            this.codec = DataTypes.copyOf(chunk.getCodec());
+
+        if (chunk.codec.isPresent()) {
+            this.codec = Optional.ofNullable(DataTypes.copyOf(chunk.getCodec()));
         }
-        if (chunk.getDescription() != null) {
-            this.description = DataTypes.copyOf(chunk.getDescription());
+        if (chunk.description.isPresent()) {
+            this.description = Optional.ofNullable(DataTypes.copyOf(chunk.getDescription()));
         }
+        LOGGER.debug(chunk.toString());
     }
 
     public ID getChunkID() {
@@ -63,11 +93,11 @@ public class CommonChunk implements Chunk {
     }
 
     public ID getCodec() {
-        return codec;
+        return codec.orElse(null);
     }
 
     public byte[] getDescription() {
-        return description;
+        return description.orElse(null);
     }
 
     public static class Builder {
@@ -114,12 +144,13 @@ public class CommonChunk implements Chunk {
         }
 
         public Builder withCodec(ID codec) {
-            instance.codec = codec;
+            instance.codec = Optional.ofNullable(codec);
             return this;
         }
 
         public Builder withDescription(byte[] description) {
-            instance.description = description;
+            LOGGER.debug(String.format("A description of %s bytes: \"%s\"", description.length, new String(description)));
+            instance.description = Optional.ofNullable(description);
             return this;
         }
     }
@@ -166,7 +197,7 @@ public class CommonChunk implements Chunk {
                 ", sampleSize=" + sampleSize +
                 ", sampleRate=" + sampleRate +
                 ", codec=" + codec +
-                ", description=" + (description == null ? null : new String(description)) +
+                ", description=" + (description.isPresent() ? new String(description.get()) : null) +
                 '}';
     }
 }

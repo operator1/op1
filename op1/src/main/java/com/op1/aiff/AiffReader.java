@@ -2,12 +2,16 @@ package com.op1.aiff;
 
 import com.op1.iff.IffReader;
 import com.op1.iff.types.ID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
-public class AiffReader {
+public class AiffReader implements Closeable {
 
     private final IffReader iffReader;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiffReader.class);
 
     public AiffReader(IffReader iffReader) {
         this.iffReader = iffReader;
@@ -37,7 +41,7 @@ public class AiffReader {
         while (true) {
             try {
                 final ID id = iffReader.readID();
-                System.out.println(String.format("Found chunk: %s", id.getName()));
+                LOGGER.debug(String.format("Found chunk: %s", id.getName()));
 
                 if (ChunkType.isKnownChunk(id.getName())) {
                     readKnownChunk(builder, id);
@@ -46,9 +50,9 @@ public class AiffReader {
                     builder.withChunk(id, UnknownChunk.readUnknownChunk(iffReader, id));
                 }
 
-            } catch (Exception e) {
+            } catch (EOFException e) {
                 // TODO: don't use exceptions to control expected flow.
-                System.out.println("Reached end of stream");
+                LOGGER.debug(String.format("Reached end of stream (%s)", e.getMessage()));
                 break;
             }
         }
@@ -57,5 +61,9 @@ public class AiffReader {
     private void readKnownChunk(Aiff.Builder builder, ID id) throws IOException {
         final ChunkType chunkType = ChunkType.fromName(id.getName());
         builder.withChunk(id, chunkType.readChunk(iffReader));
+    }
+
+    public void close() throws IOException {
+        iffReader.close();
     }
 }
