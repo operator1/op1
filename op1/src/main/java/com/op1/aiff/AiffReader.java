@@ -2,6 +2,7 @@ package com.op1.aiff;
 
 import com.op1.iff.IffReader;
 import com.op1.iff.types.ID;
+import com.op1.iff.types.SignedLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +28,13 @@ public class AiffReader implements Closeable {
 
     public Aiff readAiff() throws IOException {
 
+        final ID chunkId = iffReader.readID();
+        final SignedLong chunkSize = iffReader.readSignedLong();
+        LOGGER.debug(String.format("Found chunk: %s", chunkId.getName()));
+        LOGGER.debug(String.format("Chunk size: %s", chunkSize));
         final Aiff.Builder builder = new Aiff.Builder()
-                .withChunkId(iffReader.readID())
-                .withChunkSize(iffReader.readSignedLong())
+                .withChunkId(chunkId)
+                .withChunkSize(chunkSize)
                 .withFormType(iffReader.readID());
 
         readChunks(builder);

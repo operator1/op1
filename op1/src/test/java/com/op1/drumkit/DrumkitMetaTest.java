@@ -9,6 +9,8 @@ import com.op1.iff.IffReader;
 import com.op1.iff.types.SignedChar;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
@@ -16,12 +18,15 @@ import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class DrumkitMetaTest {
 
     private static final String DRUMKIT_FILE = "PO-12.aif";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DrumkitMetaTest.class);
 
     @Test
     public void canGetDrumkitMetaFromJson() throws Exception {
@@ -75,6 +80,49 @@ public class DrumkitMetaTest {
         DrumkitMeta meta = DrumkitMeta.fromJson(json);
         System.out.println(meta);
         System.out.println(aiff.getCommonChunk());
+    }
+
+    @Test
+    public void canGetJsonFromDrumkitMeta() throws Exception {
+
+        // given
+        final DrumkitMeta drumkitMeta = DrumkitMeta.newDefaultDrumkitMeta("default");
+
+        // when
+        final String json = DrumkitMeta.toJson(drumkitMeta);
+        LOGGER.debug(String.format("json: %s", json));
+
+        // then
+        assertThat(json, notNullValue());
+        assertThat(json.length(), greaterThan(0));
+    }
+
+    @Test
+    public void drumkitMetaToJsonToDrumkitMetaYieldsSameObject() throws Exception {
+
+        // given
+        final DrumkitMeta drumkitMeta = DrumkitMeta.newDefaultDrumkitMeta("default");
+
+        // when
+        final String json = DrumkitMeta.toJson(drumkitMeta);
+        final DrumkitMeta result = DrumkitMeta.fromJson(json);
+
+        // then
+        assertThat(drumkitMeta, equalTo(result));
+    }
+
+    @Test
+    public void jsonToDrumkitMetaToJsonYieldsSameString() throws Exception {
+
+        // given
+        final String json = DrumkitMeta.toJson(DrumkitMeta.newDefaultDrumkitMeta("default"));
+
+        // when
+        final DrumkitMeta drumkitMeta = DrumkitMeta.fromJson(json);
+        final String result = DrumkitMeta.toJson(drumkitMeta);
+
+        // then
+        assertThat(json, equalTo(result));
     }
 
     private void assertIsArrayOfSize24(int[] array) {

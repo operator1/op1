@@ -14,6 +14,10 @@ public class ID extends DataType {
         this.name = new String(bytes);
     }
 
+    public static ID valueOf(String s) {
+        return new ID(s.getBytes());
+    }
+
     public String getName() {
         return name;
     }

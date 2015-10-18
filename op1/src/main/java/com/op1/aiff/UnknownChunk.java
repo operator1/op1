@@ -5,6 +5,8 @@ import com.op1.iff.IffReader;
 import com.op1.iff.types.ID;
 import com.op1.iff.types.SignedLong;
 import com.op1.util.Check;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,6 +16,8 @@ public class UnknownChunk implements Chunk {
     private ID chunkId;
     private SignedLong chunkSize;
     private byte[] chunkData;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnknownChunk.class);
 
     private UnknownChunk() {
     }
@@ -25,16 +29,18 @@ public class UnknownChunk implements Chunk {
     }
 
     @Override
-    public int getSize() {
+    public int getPhysicalSize() {
         return chunkId.getSize()
                 + chunkSize.getSize()
                 + chunkData.length;
     }
 
+    @Override
     public ID getChunkID() {
         return chunkId;
     }
 
+    @Override
     public SignedLong getChunkSize() {
         return chunkSize;
     }
@@ -76,6 +82,7 @@ public class UnknownChunk implements Chunk {
 
     public static UnknownChunk readUnknownChunk(IffReader iffReader, ID chunkId) throws IOException {
         final SignedLong chunkSize = iffReader.readSignedLong();
+        LOGGER.debug(String.format("Chunk size: %s", chunkSize));
         final byte[] chunkData = iffReader.readBytes(chunkSize.toInt());
         return new UnknownChunk.Builder()
                 .withChunkId(chunkId)

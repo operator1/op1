@@ -1,7 +1,9 @@
 package com.op1.aiff;
 
+import com.op1.drumkit.DrumkitMeta;
 import com.op1.iff.Chunk;
 import com.op1.iff.types.ID;
+import com.op1.iff.types.SignedChar;
 import com.op1.iff.types.SignedLong;
 import com.op1.util.Check;
 
@@ -10,8 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.op1.aiff.ChunkType.COMMON;
-import static com.op1.aiff.ChunkType.SOUND_DATA;
+import static com.op1.aiff.ChunkType.*;
+import static java.lang.System.lineSeparator;
 
 public class Aiff implements Chunk {
 
@@ -19,9 +21,9 @@ public class Aiff implements Chunk {
     private SignedLong chunkSize;
     private ID formType;
 
-    private Map<ID, List<Chunk>> chunksMap = new LinkedHashMap<ID, List<Chunk>>();
+    private Map<ID, List<Chunk>> chunksMap = new LinkedHashMap<>();
 
-    public Aiff() {
+    private Aiff() {
     }
 
     public ID getChunkID() {
@@ -29,7 +31,7 @@ public class Aiff implements Chunk {
     }
 
     @Override
-    public int getSize() {
+    public int getPhysicalSize() {
 
         int size = chunkId.getSize()
                 + chunkSize.getSize()
@@ -37,7 +39,7 @@ public class Aiff implements Chunk {
 
         for (List<Chunk> chunks : chunksMap.values()) {
             for (Chunk chunk : chunks) {
-                size += chunk.getSize();
+                size += chunk.getPhysicalSize();
             }
         }
 
@@ -58,6 +60,16 @@ public class Aiff implements Chunk {
 
     public List<Chunk> getChunks(ID chunkId) {
         return chunksMap.get(chunkId);
+    }
+
+    public boolean hasChunk(ChunkType chunkType) {
+        return chunksMap.containsKey(chunkType.getChunkId());
+    }
+
+    public Chunk getChunk(ID chunkId) {
+        final List<Chunk> chunks = chunksMap.get(chunkId);
+        Check.that(chunks != null && chunks.size() == 1, String.format("There are more than one %s chunk", chunkId));
+        return chunks.get(0);
     }
 
     public CommonChunk getCommonChunk() {
@@ -81,16 +93,6 @@ public class Aiff implements Chunk {
 
     public boolean hasSoundDataChunk() {
         return chunksMap.containsKey(SOUND_DATA.getChunkId());
-    }
-
-    @Override
-    public String toString() {
-        return "Aiff{" +
-                "chunkId=" + chunkId +
-                ", chunkSize=" + chunkSize +
-                ", formType=" + formType +
-                ", chunksMap=" + chunksMap +
-                '}';
     }
 
     public static class Builder {
@@ -140,11 +142,97 @@ public class Aiff implements Chunk {
             // Guava's multimap would come in handy here, but resisting for the sake of having no dependencies.
             List<Chunk> chunks = instance.chunksMap.get(chunkId);
             if (chunks == null) {
-                chunks = new ArrayList<Chunk>();
+                chunks = new ArrayList<>();
                 instance.chunksMap.put(chunkId, chunks);
             }
             chunks.add(chunk);
             return this;
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder().append(lineSeparator());
+        builder.append("----------------------------------------").append(lineSeparator());
+        builder.append("| chunkId: ").append(chunkId).append(lineSeparator());
+        builder.append("| chunkSize: ").append(chunkSize).append(lineSeparator());
+        builder.append("|").append(lineSeparator());
+        builder.append("| formType: ").append(formType).append(lineSeparator());
+        builder.append("| |-------------------------------------").append(lineSeparator());
+
+        for (List<Chunk> chunkList : chunksMap.values()) {
+            for (Chunk chunk : chunkList) {
+                if (chunk instanceof CommonChunk) {
+                    CommonChunk commonChunk = (CommonChunk) chunk;
+                    toString(builder, commonChunk);
+                } else if (chunk instanceof SoundDataChunk) {
+                    SoundDataChunk soundDataChunk = (SoundDataChunk) chunk;
+                    toString(builder, soundDataChunk);
+                } else if (chunk instanceof FormatVersionChunk) {
+                    FormatVersionChunk formatVersionChunk = (FormatVersionChunk) chunk;
+                    toString(builder, formatVersionChunk);
+                } else if (chunk instanceof ApplicationChunk) {
+                    ApplicationChunk applicationChunk = (ApplicationChunk) chunk;
+                    toString(builder, applicationChunk);
+                }
+            }
+        }
+
+        builder.append("|").append(lineSeparator());
+        builder.append("----------------------------------------").append(lineSeparator());
+
+        if (hasChunk(APPLICATION)) {
+            final List<Chunk> chunks = chunksMap.get(APPLICATION.getChunkId());
+            for (Chunk chunk : chunks) {
+                final String jsonPrettyPrint = DrumkitMeta.toJsonPrettyPrint(DrumkitMeta.fromJson(SignedChar.getString(((ApplicationChunk) chunk).getData())));
+                builder.append(String.format("%n%s", jsonPrettyPrint));
+            }
+        }
+
+        return builder.toString();
+    }
+
+    private void toString(StringBuilder builder, CommonChunk commonChunk) {
+        builder.append("| | chunkId: ").append(commonChunk.getChunkID()).append(lineSeparator());
+        builder.append("| | chunkSize: ").append(commonChunk.getChunkSize()).append(lineSeparator());
+        builder.append("| |").append(lineSeparator());
+        builder.append("| | numChannels: ").append(commonChunk.getNumChannels()).append(lineSeparator());
+        builder.append("| | numSampleFrames: ").append(commonChunk.getNumSampleFrames()).append(lineSeparator());
+        builder.append("| | sampleSize: ").append(commonChunk.getSampleSize()).append(lineSeparator());
+        builder.append("| | sampleRate: ").append(commonChunk.getSampleRate()).append(lineSeparator());
+        if (commonChunk.getCodec() != null) {
+            builder.append("| | codec: ").append(commonChunk.getCodec()).append(lineSeparator());
+        }
+        if (commonChunk.getDescription() != null) {
+            builder.append("| | description: ").append(new String(commonChunk.getDescription())).append(lineSeparator());
+        }
+        builder.append("| |-------------------------------------").append(lineSeparator());
+    }
+
+    private void toString(StringBuilder builder, SoundDataChunk chunk) {
+        builder.append("| | chunkId: ").append(chunk.getChunkID()).append(lineSeparator());
+        builder.append("| | chunkSize: ").append(chunk.getChunkSize()).append(lineSeparator());
+        builder.append("| |").append(lineSeparator());
+        builder.append("| | offset: ").append(chunk.getOffset()).append(lineSeparator());
+        builder.append("| | blockSize: ").append(chunk.getBlockSize()).append(lineSeparator());
+        builder.append("| | sampleData: ").append("<sample data> (").append(chunk.getSampleData().length).append(" bytes)").append(lineSeparator());
+        builder.append("| |-------------------------------------").append(lineSeparator());
+    }
+
+    private void toString(StringBuilder builder, FormatVersionChunk chunk) {
+        builder.append("| | chunkId: ").append(chunk.getChunkID()).append(lineSeparator());
+        builder.append("| | chunkSize: ").append(chunk.getChunkSize()).append(lineSeparator());
+        builder.append("| |").append(lineSeparator());
+        builder.append("| | timestamp: ").append(chunk.getTimestamp()).append(lineSeparator());
+        builder.append("| |-------------------------------------").append(lineSeparator());
+    }
+
+    private void toString(StringBuilder builder, ApplicationChunk chunk) {
+        builder.append("| | chunkId: ").append(chunk.getChunkID()).append(lineSeparator());
+        builder.append("| | chunkSize: ").append(chunk.getChunkSize()).append(lineSeparator());
+        builder.append("| |").append(lineSeparator());
+        builder.append("| | applicationSignature: ").append(chunk.getApplicationSignature()).append(lineSeparator());
+        builder.append("| | data: ").append("<data> (").append(chunk.getData().length).append(" bytes)").append(lineSeparator());
+        builder.append("| |-------------------------------------").append(lineSeparator());
     }
 }

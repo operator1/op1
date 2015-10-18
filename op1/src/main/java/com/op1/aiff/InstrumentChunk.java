@@ -70,10 +70,12 @@ public class InstrumentChunk implements Chunk {
                 '}';
     }
 
+    @Override
     public ID getChunkID() {
         return chunkId;
     }
 
+    @Override
     public SignedLong getChunkSize() {
         return chunkSize;
     }
@@ -155,7 +157,7 @@ public class InstrumentChunk implements Chunk {
     }
 
     @Override
-    public int getSize() {
+    public int getPhysicalSize() {
         return chunkId.getSize()
                 + chunkSize.getSize()
                 + baseNote.getSize()

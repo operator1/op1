@@ -25,7 +25,7 @@ public class BinCompletionAlgorithmTest {
         final Item item6 = new Item("f", 11.0);
         final Item item7 = new Item("g", 5.0);
 
-        final List<Item> items = new ArrayList<Item>(7);
+        final List<Item> items = new ArrayList<>(7);
         items.add(item1);
         items.add(item2);
         items.add(item3);
@@ -35,7 +35,7 @@ public class BinCompletionAlgorithmTest {
         items.add(item7);
 
         // when
-        final List<Bin> bins = new BinCompletionAlgorithm(capacity, items).packBins();
+        final List<Bin> bins = new BinCompletionAlgorithm(capacity, items, 100).packBins();
 
         // then
         final Bin expectedBin1 = new Bin(capacity, newArrayList(item1, item5, item7));
@@ -45,7 +45,7 @@ public class BinCompletionAlgorithmTest {
     }
 
     private List<Item> newArrayList(Item... items) {
-        final List<Item> list = new ArrayList<Item>(items.length);
+        final List<Item> list = new ArrayList<>(items.length);
         Collections.addAll(list, items);
         return list;
     }

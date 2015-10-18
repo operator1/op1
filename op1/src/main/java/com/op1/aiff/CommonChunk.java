@@ -4,32 +4,28 @@ import com.op1.iff.Chunk;
 import com.op1.iff.IffReader;
 import com.op1.iff.types.*;
 import com.op1.util.Check;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import sun.text.normalizer.UTF16;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class CommonChunk implements Chunk {
 
-    private final ID chunkId = ChunkType.COMMON.getChunkId();   // 4 bytes
-    private SignedLong chunkSize;                               // 4 bytes
+    private final ID chunkId = ChunkType.COMMON.getChunkId();     // 4 bytes
+    private SignedLong chunkSize;                                 // 4 bytes
 
-    private SignedShort numChannels;                            // 2 bytes
-    private UnsignedLong numSampleFrames;                       // 4 bytes
-    private SignedShort sampleSize;                             // 2 bytes
-    private Extended sampleRate;                                // 10 bytes
+    private SignedShort numChannels;                              // 2 bytes
+    private UnsignedLong numSampleFrames;                         // 4 bytes
+    private SignedShort sampleSize;                               // 2 bytes
+    private Extended sampleRate;                                  // 10 bytes
 
-    // These two seem to be optional
-    private Optional<ID> codec = Optional.empty();              // 4 bytes
-    private Optional<byte[]> description = Optional.empty();    // the rest
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonChunk.class);
+    // codec and description are part of the AIFC spec
+    private Optional<ID> codec = Optional.empty();                // 4 bytes
+    private Optional<List<Byte>> description = Optional.empty();  // the rest
 
     @Override
-    public int getSize() {
+    public int getPhysicalSize() {
 
         int size = chunkId.getSize()
                 + chunkSize.getSize()
@@ -43,7 +39,7 @@ public class CommonChunk implements Chunk {
         }
 
         if (description.isPresent()) {
-            size += description.get().length;
+            size += description.get().size();
         }
 
         return size;
@@ -63,15 +59,21 @@ public class CommonChunk implements Chunk {
             this.codec = Optional.ofNullable(DataTypes.copyOf(chunk.getCodec()));
         }
         if (chunk.description.isPresent()) {
-            this.description = Optional.ofNullable(DataTypes.copyOf(chunk.getDescription()));
+            final byte[] description = chunk.getDescription();
+            final ArrayList<Byte> descriptionBytes = new ArrayList<>(description.length);
+            for (Byte descriptionByte : description) {
+                descriptionBytes.add(descriptionByte);
+            }
+            this.description = Optional.of(descriptionBytes);
         }
-        LOGGER.debug(chunk.toString());
     }
 
+    @Override
     public ID getChunkID() {
         return chunkId;
     }
 
+    @Override
     public SignedLong getChunkSize() {
         return chunkSize;
     }
@@ -97,7 +99,14 @@ public class CommonChunk implements Chunk {
     }
 
     public byte[] getDescription() {
-        return description.orElse(null);
+        if (description.isPresent()) {
+            final byte[] bytes = new byte[description.get().size()];
+            for (int i = 0; i < description.get().size(); i++) {
+                bytes[i] = description.get().get(i);
+            }
+            return bytes;
+        }
+        return null;
     }
 
     public static class Builder {
@@ -109,12 +118,26 @@ public class CommonChunk implements Chunk {
         }
 
         public CommonChunk build() {
+
             Check.notNull(instance.chunkId, "Missing chunkId");
             Check.notNull(instance.chunkSize, "Missing chunkSize");
             Check.notNull(instance.numChannels, "Missing numChannels");
             Check.notNull(instance.numSampleFrames, "Missing numSampleFrames");
             Check.notNull(instance.sampleSize, "Missing sampleSize");
             Check.notNull(instance.sampleRate, "Missing sampleRate");
+
+            if (instance.description.isPresent()) {
+                final List<Byte> bytes = instance.description.get();
+                final boolean hasOddNumberOfBytes = bytes.size() % 2 == 1;
+                if (hasOddNumberOfBytes) {
+                    bytes.add((byte) 0);
+                }
+            }
+
+            if (instance.description.isPresent() && !instance.codec.isPresent()) {
+                throw new IllegalArgumentException("Expected codec to be present since description has been provided");
+            }
+
             return new CommonChunk(instance);
         }
 
@@ -149,8 +172,13 @@ public class CommonChunk implements Chunk {
         }
 
         public Builder withDescription(byte[] description) {
-            LOGGER.debug(String.format("A description of %s bytes: \"%s\"", description.length, new String(description)));
-            instance.description = Optional.ofNullable(description);
+            if (description != null) {
+                final List<Byte> bytes = new ArrayList<>(description.length);
+                for (byte b : description) {
+                    bytes.add(b);
+                }
+                instance.description = Optional.of(bytes);
+            }
             return this;
         }
     }
@@ -197,7 +225,15 @@ public class CommonChunk implements Chunk {
                 ", sampleSize=" + sampleSize +
                 ", sampleRate=" + sampleRate +
                 ", codec=" + codec +
-                ", description=" + (description.isPresent() ? new String(description.get()) : null) +
+                ", description=" + (description.isPresent() ? new String(toByteArray(description.get())) : null) +
                 '}';
+    }
+
+    private static byte[] toByteArray(List<Byte> byteList) {
+        final byte[] bytes = new byte[byteList.size()];
+        for (int i = 0; i < byteList.size(); i++) {
+            bytes[i] = byteList.get(i);
+        }
+        return bytes;
     }
 }

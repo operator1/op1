@@ -6,11 +6,8 @@ import com.op1.iff.types.ID;
 import com.op1.iff.types.SignedLong;
 import com.op1.iff.types.UnsignedLong;
 import com.op1.util.Check;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class SoundDataChunk implements Chunk {
 
@@ -24,8 +21,6 @@ public class SoundDataChunk implements Chunk {
     // It does, however, expose a security hole in the getSampleData() method.
     private byte[] sampleData;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SoundDataChunk.class);
-
     private SoundDataChunk() {
     }
 
@@ -34,11 +29,10 @@ public class SoundDataChunk implements Chunk {
         this.offset = chunk.getOffset();
         this.blockSize = chunk.getBlockSize();
         this.sampleData = chunk.getSampleData();
-        LOGGER.debug(chunk.toString());
     }
 
     @Override
-    public int getSize() {
+    public int getPhysicalSize() {
         return chunkId.getSize()
                 + chunkSize.getSize()
                 + offset.getSize()
@@ -57,10 +51,12 @@ public class SoundDataChunk implements Chunk {
                 '}';
     }
 
+    @Override
     public ID getChunkID() {
         return chunkId;
     }
 
+    @Override
     public SignedLong getChunkSize() {
         return chunkSize;
     }
@@ -124,7 +120,7 @@ public class SoundDataChunk implements Chunk {
                 .withOffset(iffReader.readUnsignedLong())
                 .withBlockSize(iffReader.readUnsignedLong());
 
-        final int numSampleBytes = chunkSize.toInt() - 8;
+        final int numSampleBytes = chunkSize.toInt() - 8; // -8 for offset and block size
         final byte[] sampleData = new byte[numSampleBytes];
         for (int i = 0; i < sampleData.length; i++) {
             sampleData[i] = iffReader.readByte();

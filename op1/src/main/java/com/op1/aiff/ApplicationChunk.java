@@ -7,8 +7,6 @@ import com.op1.iff.types.OSType;
 import com.op1.iff.types.SignedChar;
 import com.op1.iff.types.SignedLong;
 import com.op1.util.Check;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,9 +18,7 @@ public class ApplicationChunk implements Chunk {
     private final ID chunkId = ChunkType.APPLICATION.getChunkId();  // 4 bytes
     private SignedLong chunkSize;                                   // 4 bytes
     private OSType applicationSignature;                            // 4 bytes
-    private SignedChar[] data;                                      // 2 bytes per item
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationChunk.class);
+    private SignedChar[] data;                                      // 1 byte per item
 
     private ApplicationChunk() {
     }
@@ -31,7 +27,6 @@ public class ApplicationChunk implements Chunk {
         this.chunkSize = chunk.getChunkSize();
         this.applicationSignature = chunk.getApplicationSignature();
         this.data = Arrays.copyOf(chunk.getData(), chunk.getData().length);
-        LOGGER.debug(this.toString()); // TODO: allowing this to escape
     }
 
     @Override
@@ -45,7 +40,7 @@ public class ApplicationChunk implements Chunk {
     }
 
     @Override
-    public int getSize() {
+    public int getPhysicalSize() {
 
         int size = chunkId.getSize()
                 + chunkSize.getSize()
@@ -58,10 +53,12 @@ public class ApplicationChunk implements Chunk {
         return size;
     }
 
+    @Override
     public ID getChunkID() {
         return chunkId;
     }
 
+    @Override
     public SignedLong getChunkSize() {
         return chunkSize;
     }
@@ -111,15 +108,7 @@ public class ApplicationChunk implements Chunk {
         OSType applicationSignature = reader.readOSType();
 
         int numCharsToRead = (chunkSize.toInt() - 4);
-        List<SignedChar> data = new ArrayList<>();
-        for (int i = 0; i < numCharsToRead; i++) {
-            try {
-                data.add(reader.readSignedChar());
-            } catch (IOException e) {
-                LOGGER.error("Had problems reading application chunk's data on i == " + i, e);
-                throw e;
-            }
-        }
+        List<SignedChar> data = getApplicationData(reader, numCharsToRead);
         final SignedChar[] dataArray = data.toArray(new SignedChar[data.size()]);
 
         return new ApplicationChunk.Builder()
@@ -127,6 +116,14 @@ public class ApplicationChunk implements Chunk {
                 .withApplicationSignature(applicationSignature)
                 .withData(dataArray)
                 .build();
+    }
+
+    private static List<SignedChar> getApplicationData(IffReader reader, int numCharsToRead) throws IOException {
+        final List<SignedChar> data1 = new ArrayList<>(numCharsToRead);
+        for (int i = 0; i < numCharsToRead; i++) {
+            data1.add(new SignedChar(reader.readByte()));
+        }
+        return data1;
     }
 
     public static class ApplicationChunkReader implements ChunkReader {

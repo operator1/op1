@@ -13,7 +13,8 @@ public enum ChunkType {
     SOUND_DATA("SSND", new SoundDataChunk.SoundDataChunkReader()),
     MARKER("MARK", new MarkerChunk.MarkerChunkReader()),
     INSTRUMENT("INST", new InstrumentChunk.InstrumentChunkReader()),
-    APPLICATION("APPL", new ApplicationChunk.ApplicationChunkReader());
+    APPLICATION("APPL", new ApplicationChunk.ApplicationChunkReader()),
+    FORMAT_VERSION("FVER", new FormatVersionChunk.FormatVersionChunkReader());
 
     // Here are some currently unsupported chunks that need fleshing out:
 

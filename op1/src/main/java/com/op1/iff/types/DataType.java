@@ -24,4 +24,6 @@ public abstract class DataType {
     public int getSize() {
         return bytes.length;
     }
+
+
 }

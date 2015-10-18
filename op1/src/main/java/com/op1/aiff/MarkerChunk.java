@@ -42,7 +42,7 @@ public class MarkerChunk implements Chunk {
     }
 
     @Override
-    public int getSize() {
+    public int getPhysicalSize() {
 
         int size = chunkId.getSize()
                 + chunkSize.getSize()
@@ -55,10 +55,12 @@ public class MarkerChunk implements Chunk {
         return size;
     }
 
+    @Override
     public ID getChunkID() {
         return chunkId;
     }
 
+    @Override
     public SignedLong getChunkSize() {
         return chunkSize;
     }

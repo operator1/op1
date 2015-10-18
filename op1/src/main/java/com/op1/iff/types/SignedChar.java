@@ -23,6 +23,16 @@ public class SignedChar extends DataType {
         return String.valueOf(chars);
     }
 
+    public static SignedChar[] fromString(String s) {
+
+        final byte[] bytes = s.getBytes();
+        final SignedChar[] signedChars = new SignedChar[bytes.length];
+        for (int i = 0; i < bytes.length; i++) {
+            signedChars[i] = new SignedChar(bytes[i]);
+        }
+        return signedChars;
+    }
+
     public String toString() {
         return String.valueOf((short) toByteArray()[0]);
     }

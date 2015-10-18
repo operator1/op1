@@ -4,8 +4,6 @@ import com.op1.iff.Chunk;
 import com.op1.iff.IffWriter;
 import com.op1.iff.types.ID;
 import com.op1.iff.types.SignedChar;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.List;
@@ -17,8 +15,6 @@ import static com.op1.aiff.ChunkType.*;
 public class AiffWriter implements Closeable {
 
     private final IffWriter writer;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AiffWriter.class);
 
     public AiffWriter(IffWriter writer) {
         this.writer = writer;
@@ -55,6 +51,8 @@ public class AiffWriter implements Closeable {
                     writeMarkerChunk((MarkerChunk) chunk);
                 } else if (isChunkType(chunk, INSTRUMENT)) {
                     writeInstrumentChunk((InstrumentChunk) chunk);
+                } else if (isChunkType(chunk, FORMAT_VERSION)) {
+                    writeFormatVersionChunk((FormatVersionChunk) chunk);
                 } else {
                     writeUnknownChunk((UnknownChunk) chunk);
                 }
@@ -88,18 +86,9 @@ public class AiffWriter implements Closeable {
 
     private void writeApplicationChunk(ApplicationChunk chunk) throws IOException {
 
-        LOGGER.debug(String.format("Writing APPL chunk %s bytes for chunk ID", chunk.getChunkID().getSize()));
         writer.write(chunk.getChunkID());
-        LOGGER.debug(String.format("Writing APPL chunk %s bytes for chunk size", chunk.getChunkSize().getSize()));
         writer.write(chunk.getChunkSize());
-        LOGGER.debug(String.format("Writing APPL chunk %s bytes for application signature", chunk.getApplicationSignature().getSize()));
         writer.write(chunk.getApplicationSignature());
-
-        int numDataBytesToWrite = 0;
-        for (SignedChar signedChar : chunk.getData()) {
-            numDataBytesToWrite += signedChar.getSize();
-        }
-        LOGGER.debug(String.format("Writing APPL chunk %s bytes for data", numDataBytesToWrite));
 
         for (SignedChar signedChar : chunk.getData()) {
             writer.write(signedChar);
@@ -140,6 +129,12 @@ public class AiffWriter implements Closeable {
         writer.write(loop.getPlayMode());
         writer.write(loop.getBeginLoop());
         writer.write(loop.getEndLoop());
+    }
+
+    private void writeFormatVersionChunk(FormatVersionChunk chunk) throws IOException {
+        writer.write(chunk.getChunkID());
+        writer.write(chunk.getChunkSize());
+        writer.write(chunk.getTimestamp());
     }
 
     private void writeUnknownChunk(UnknownChunk chunk) throws IOException {

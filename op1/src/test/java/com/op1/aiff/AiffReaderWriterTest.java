@@ -2,6 +2,7 @@ package com.op1.aiff;
 
 import com.op1.iff.Chunk;
 import com.op1.iff.types.ID;
+import com.op1.util.ChannelSplitter;
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,6 +33,11 @@ public class AiffReaderWriterTest {
     }
 
     @Test
+    public void read_and_write_album_side_b_file_produces_same_file() throws Exception {
+        doReadWriteTest(ExampleFile.ALBUM_SIDE_B.getFile());
+    }
+
+    @Test
     public void read_and_write_tape_file_produces_same_file() throws Exception {
         doReadWriteTest(ExampleFile.TAPE.getFile());
     }
@@ -43,7 +49,12 @@ public class AiffReaderWriterTest {
 
     @Test
     public void read_and_write_drum_preset_file_produces_same_file() throws Exception {
-        doReadWriteTest(ExampleFile.DRUM_PRESET.getFile());
+        doReadWriteTest(ExampleFile.DRUM_PRESET_1.getFile());
+    }
+
+    @Test
+    public void read_and_write_synth_preset_file_produces_same_file() throws Exception {
+        doReadWriteTest(ExampleFile.SYNTH_PRESET.getFile());
     }
 
     @Test
@@ -61,6 +72,7 @@ public class AiffReaderWriterTest {
     private void doReadWriteTest(File readFile) throws IOException {
 
         // given
+        LOGGER.info(format("Size of readFile: %s", FileUtils.sizeOf(readFile)));
         final File writeFile = temporaryFolder.newFile("writeFile.aif");
         final AiffReader aiffReader = AiffReader.newAiffReader(readFile);
         final AiffWriter aiffWriter = AiffWriter.newAiffWriter(writeFile);
@@ -69,10 +81,11 @@ public class AiffReaderWriterTest {
         LOGGER.debug("\n\n\nREADING AIF\n\n\n");
         final Aiff readAiff = aiffReader.readAiff();
         LOGGER.debug(readAiff.toString());
-        LOGGER.debug(format("aiff size: %s", readAiff.getSize()));
+        LOGGER.debug(format("aiff physical size: %s", readAiff.getPhysicalSize()));
         for (Map.Entry<ID, List<Chunk>> entry : readAiff.getChunksMap().entrySet()) {
             for (Chunk chunk : entry.getValue()) {
-                LOGGER.debug(format("%s chunk size: %s", chunk.getChunkID().getName(), chunk.getSize()));
+                LOGGER.debug(String.format("Chunk: %s", chunk.toString()));
+                LOGGER.debug(format("%s chunk physical size: %s", chunk.getChunkID().getName(), chunk.getPhysicalSize()));
             }
         }
 

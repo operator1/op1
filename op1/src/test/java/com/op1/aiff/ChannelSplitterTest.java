@@ -2,6 +2,7 @@ package com.op1.aiff;
 
 import com.op1.iff.IffReader;
 import com.op1.iff.IffWriter;
+import com.op1.util.ChannelSplitter;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -16,7 +17,7 @@ public class ChannelSplitterTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    private static final String ALBUM_FILE = "Scrap30.aif";
+    private static final String ALBUM_FILE = "side_b.aif";
 
     @Test
     public void canSplitStereoFile() throws Exception {

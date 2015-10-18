@@ -118,6 +118,56 @@ public class DrumkitMeta {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DrumkitMeta that = (DrumkitMeta) o;
+
+        if (drumVersion != that.drumVersion) return false;
+        if (octave != that.octave) return false;
+        if (fxActive != that.fxActive) return false;
+        if (lfoActive != that.lfoActive) return false;
+        if (!type.equals(that.type)) return false;
+        if (!name.equals(that.name)) return false;
+        if (!Arrays.equals(pitch, that.pitch)) return false;
+        if (!Arrays.equals(start, that.start)) return false;
+        if (!Arrays.equals(end, that.end)) return false;
+        if (!Arrays.equals(playmode, that.playmode)) return false;
+        if (!Arrays.equals(reverse, that.reverse)) return false;
+        if (!Arrays.equals(volume, that.volume)) return false;
+        if (!Arrays.equals(dynaEnv, that.dynaEnv)) return false;
+        if (!fxType.equals(that.fxType)) return false;
+        if (!Arrays.equals(fxParams, that.fxParams)) return false;
+        //noinspection SimplifiableIfStatement
+        if (!lfoType.equals(that.lfoType)) return false;
+        return Arrays.equals(lfoParams, that.lfoParams);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = drumVersion;
+        result = 31 * result + type.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + octave;
+        result = 31 * result + Arrays.hashCode(pitch);
+        result = 31 * result + Arrays.hashCode(start);
+        result = 31 * result + Arrays.hashCode(end);
+        result = 31 * result + Arrays.hashCode(playmode);
+        result = 31 * result + Arrays.hashCode(reverse);
+        result = 31 * result + Arrays.hashCode(volume);
+        result = 31 * result + Arrays.hashCode(dynaEnv);
+        result = 31 * result + (fxActive ? 1 : 0);
+        result = 31 * result + fxType.hashCode();
+        result = 31 * result + Arrays.hashCode(fxParams);
+        result = 31 * result + (lfoActive ? 1 : 0);
+        result = 31 * result + lfoType.hashCode();
+        result = 31 * result + Arrays.hashCode(lfoParams);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "DrumkitMeta{" +
                 "drumVersion=" + drumVersion +
@@ -260,5 +310,49 @@ public class DrumkitMeta {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create()
                 .fromJson(jsonString, DrumkitMeta.class);
+    }
+
+    public static String toJson(DrumkitMeta drumkitMeta) {
+        return new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create()
+                .toJson(drumkitMeta);
+    }
+
+    public static String toJsonPrettyPrint(DrumkitMeta drumkitMeta) {
+        return new GsonBuilder()
+                .setPrettyPrinting()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create()
+                .toJson(drumkitMeta);
+    }
+
+    public static DrumkitMeta newDefaultDrumkitMeta(String name) {
+
+        return new DrumkitMeta.Builder()
+                .withDrumVersion(1)
+                .withDynaEnv(new int[]{0, 8192, 0, 8192, 0, 0, 0, 0})
+                .withStart(new int[24])
+                .withEnd(new int[24])
+                .withFxActive(false)
+                .withFxParams(new int[]{0, 0, 0, 0, 8000, 8000, 8000, 8000})
+                .withFxType("delay") // TODO: enum
+                .withLfoActive(false)
+                .withLfoParams(new int[]{16000, 16000, 16000, 16000, 0, 0, 0, 0})
+                .withLfoType("tremolo") // TODO: enum
+                .withName(name)
+                .withOctave(0)
+                .withPitch(new int[24])
+                .withPlaymode(newIntArray(24, 8192))
+                .withReverse(newIntArray(24, 8192))
+                .withType("drum")
+                .withVolume(newIntArray(24, 8192))
+                .build();
+    }
+
+    private static int[] newIntArray(int size, int fill) {
+        int[] array = new int[size];
+        Arrays.fill(array, fill);
+        return array;
     }
 }

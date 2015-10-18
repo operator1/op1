@@ -5,10 +5,11 @@ package com.op1.util;
  */
 public class Check {
 
-    public static void notNull(Object o, String message) {
-        if (o == null) {
+    public static <T> T notNull(T t, String message) {
+        if (t == null) {
             throw new IllegalArgumentException(message);
         }
+        return t;
     }
 
     public static void that(boolean b, String message) {
