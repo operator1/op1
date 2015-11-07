@@ -31,7 +31,7 @@ public class SignedLong extends DataType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SignedLong that = (SignedLong) o;
+        final SignedLong that = (SignedLong) o;
 
         return Arrays.equals(bytes, that.bytes);
 
@@ -39,7 +39,6 @@ public class SignedLong extends DataType {
 
     @Override
     public int hashCode() {
-        //noinspection ConstantConditions
-        return bytes != null ? Arrays.hashCode(bytes) : 0;
+        return Arrays.hashCode(bytes);
     }
 }

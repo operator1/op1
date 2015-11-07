@@ -2,29 +2,31 @@ package com.op1.drumkit;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.GsonBuilder;
+import com.op1.aiff.ApplicationChunk;
 import com.op1.util.Check;
+import com.op1.util.PlayMode;
 
 import java.util.Arrays;
 
 public class DrumkitMeta {
 
     private int drumVersion;
-    private String type;
+    private int[] dynaEnv;
+    private int[] end;
+    private boolean fxActive;
+    private int[] fxParams;
+    private String fxType;
+    private boolean lfoActive;
+    private int[] lfoParams;
+    private String lfoType;
     private String name;
     private int octave;
     private int[] pitch;
-    private int[] start;
-    private int[] end;
     private int[] playmode;
     private int[] reverse;
+    private int[] start;
+    private String type;
     private int[] volume;
-    private int[] dynaEnv;
-    private boolean fxActive;
-    private String fxType;
-    private int[] fxParams;
-    private boolean lfoActive;
-    private String lfoType;
-    private int[] lfoParams;
 
     private DrumkitMeta() {
     }
@@ -312,6 +314,14 @@ public class DrumkitMeta {
                 .fromJson(jsonString, DrumkitMeta.class);
     }
 
+    public static DrumkitMeta fromApplicationChunk(ApplicationChunk chunk) {
+        final String jsonString = chunk.getDataAsString();
+        return new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create()
+                .fromJson(jsonString, DrumkitMeta.class);
+    }
+
     public static String toJson(DrumkitMeta drumkitMeta) {
         return new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
@@ -328,10 +338,14 @@ public class DrumkitMeta {
     }
 
     public static DrumkitMeta newDefaultDrumkitMeta(String name) {
+        return newDefaultDrumkitMetaBuilder(name).build();
+    }
+
+    public static DrumkitMeta.Builder newDefaultDrumkitMetaBuilder(String name) {
 
         return new DrumkitMeta.Builder()
                 .withDrumVersion(1)
-                .withDynaEnv(new int[]{0, 8192, 0, 8192, 0, 0, 0, 0})
+                .withDynaEnv(new int[]{0, 8192, 0, 0, 0, 0, 0, 0})
                 .withStart(new int[24])
                 .withEnd(new int[24])
                 .withFxActive(false)
@@ -343,11 +357,10 @@ public class DrumkitMeta {
                 .withName(name)
                 .withOctave(0)
                 .withPitch(new int[24])
-                .withPlaymode(newIntArray(24, 8192))
+                .withPlaymode(newIntArray(24, PlayMode.PLAY.getMetaDataValue()))
                 .withReverse(newIntArray(24, 8192))
                 .withType("drum")
-                .withVolume(newIntArray(24, 8192))
-                .build();
+                .withVolume(newIntArray(24, 8192));
     }
 
     private static int[] newIntArray(int size, int fill) {

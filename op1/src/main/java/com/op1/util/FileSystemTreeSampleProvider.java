@@ -10,14 +10,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileSystemSampleProvider implements SampleProvider {
+public class FileSystemTreeSampleProvider implements SampleProvider {
 
     private final File startDirectory;
     private final FileFilter fileFilter;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemSampleProvider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileSystemTreeSampleProvider.class);
 
-    public FileSystemSampleProvider(final File startDirectory, final FileFilter fileFilter) {
+    public FileSystemTreeSampleProvider(final File startDirectory, final FileFilter fileFilter) {
         this.startDirectory = checkIsReadableDirectory(startDirectory);
         this.fileFilter = fileFilter;
     }

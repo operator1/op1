@@ -93,6 +93,7 @@ public class AiffWriter implements Closeable {
         for (SignedChar signedChar : chunk.getData()) {
             writer.write(signedChar);
         }
+        writer.write(chunk.getPadBytes());
     }
 
     private void writeMarkerChunk(MarkerChunk chunk) throws IOException {

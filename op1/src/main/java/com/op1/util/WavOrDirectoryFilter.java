@@ -14,25 +14,37 @@ import static javax.sound.sampled.AudioSystem.isConversionSupported;
 
 public class WavOrDirectoryFilter implements FileFilter {
 
+    private final float longestSample;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(WavOrDirectoryFilter.class);
+
+    public WavOrDirectoryFilter() {
+        this(12);
+    }
+
+    public WavOrDirectoryFilter(float longestSample) {
+        this.longestSample = longestSample;
+    }
 
     public boolean accept(File file) {
         return isReadableDirectory(file) ||
-                (isReadableWavFile(file) && isTwelveSecondsOrLess(file) && isConversionToOp1FormatSupported(file));
+                (isReadableWavFile(file) && isNumSecondsOrLess(file, longestSample) && isConversionToOp1FormatSupported(file));
     }
 
     private boolean isReadableWavFile(File pathname) {
         return pathname.isFile() && pathname.canRead() && pathname.getName().endsWith(".wav");
     }
 
-    private boolean isTwelveSecondsOrLess(File file) {
+    private boolean isNumSecondsOrLess(File file, float numSeconds) {
+
+        Check.that(numSeconds <= 12, "Can have no more than 12 seconds in an op-1 drum sample");
 
         // Assume is readable wav
         try {
             AudioFormat audioFormat = getAudioFormatOfFile(file);
             AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(file);
 
-            return hasSpecifiedFrameLength(fileFormat) && getDuration(audioFormat, fileFormat) < 12;
+            return hasSpecifiedFrameLength(fileFormat) && getDuration(audioFormat, fileFormat) < numSeconds;
 
         } catch (Exception e) {
             return false;

@@ -1,5 +1,7 @@
 package com.op1.iff.types;
 
+import java.util.Arrays;
+
 /**
  * 32 bits, the concatenation of four printable ASCII character in the range ' ' (SP, 0x20) through '~' (0x7E).
  * Spaces (0x20) cannot precede printing characters; trailing spaces are allowed.
@@ -32,16 +34,14 @@ public class ID extends DataType {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ID id = (ID) o;
+        final ID id = (ID) o;
 
-        //noinspection RedundantIfStatement
-        if (!name.equals(id.name)) return false;
+        return Arrays.equals(bytes, id.bytes);
 
-        return true;
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Arrays.hashCode(bytes);
     }
 }

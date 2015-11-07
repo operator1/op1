@@ -1,6 +1,7 @@
 package com.op1.iff.types;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * 32 bits, unsigned. Contains any number from zero to 4,294,967,295 (inclusive).
@@ -25,6 +26,22 @@ public class UnsignedLong extends DataType {
 
     public static UnsignedLong fromLong(long someLong) {
         return new UnsignedLong(ByteBuffer.allocate(4).putInt((int) someLong).array());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final UnsignedLong that = (UnsignedLong) o;
+
+        return Arrays.equals(bytes, that.bytes);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(bytes);
     }
 
     @Override

@@ -109,6 +109,37 @@ public class CommonChunk implements Chunk {
         return null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final CommonChunk that = (CommonChunk) o;
+
+        if (!chunkId.equals(that.chunkId)) return false;
+        if (!chunkSize.equals(that.chunkSize)) return false;
+        if (!numChannels.equals(that.numChannels)) return false;
+        if (!numSampleFrames.equals(that.numSampleFrames)) return false;
+        if (!sampleSize.equals(that.sampleSize)) return false;
+        if (!sampleRate.equals(that.sampleRate)) return false;
+        if (!codec.equals(that.codec)) return false;
+        return description.equals(that.description);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = chunkId.hashCode();
+        result = 31 * result + chunkSize.hashCode();
+        result = 31 * result + numChannels.hashCode();
+        result = 31 * result + numSampleFrames.hashCode();
+        result = 31 * result + sampleSize.hashCode();
+        result = 31 * result + sampleRate.hashCode();
+        result = 31 * result + codec.hashCode();
+        result = 31 * result + description.hashCode();
+        return result;
+    }
+
     public static class Builder {
 
         private final CommonChunk instance;

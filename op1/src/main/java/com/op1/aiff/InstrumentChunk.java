@@ -54,6 +54,43 @@ public class InstrumentChunk implements Chunk {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final InstrumentChunk that = (InstrumentChunk) o;
+
+        if (chunkId != null ? !chunkId.equals(that.chunkId) : that.chunkId != null) return false;
+        if (chunkSize != null ? !chunkSize.equals(that.chunkSize) : that.chunkSize != null) return false;
+        if (baseNote != null ? !baseNote.equals(that.baseNote) : that.baseNote != null) return false;
+        if (detune != null ? !detune.equals(that.detune) : that.detune != null) return false;
+        if (lowNote != null ? !lowNote.equals(that.lowNote) : that.lowNote != null) return false;
+        if (highNote != null ? !highNote.equals(that.highNote) : that.highNote != null) return false;
+        if (lowVelocity != null ? !lowVelocity.equals(that.lowVelocity) : that.lowVelocity != null) return false;
+        if (highVelocity != null ? !highVelocity.equals(that.highVelocity) : that.highVelocity != null) return false;
+        if (gain != null ? !gain.equals(that.gain) : that.gain != null) return false;
+        if (sustainLoop != null ? !sustainLoop.equals(that.sustainLoop) : that.sustainLoop != null) return false;
+        return !(releaseLoop != null ? !releaseLoop.equals(that.releaseLoop) : that.releaseLoop != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = chunkId != null ? chunkId.hashCode() : 0;
+        result = 31 * result + (chunkSize != null ? chunkSize.hashCode() : 0);
+        result = 31 * result + (baseNote != null ? baseNote.hashCode() : 0);
+        result = 31 * result + (detune != null ? detune.hashCode() : 0);
+        result = 31 * result + (lowNote != null ? lowNote.hashCode() : 0);
+        result = 31 * result + (highNote != null ? highNote.hashCode() : 0);
+        result = 31 * result + (lowVelocity != null ? lowVelocity.hashCode() : 0);
+        result = 31 * result + (highVelocity != null ? highVelocity.hashCode() : 0);
+        result = 31 * result + (gain != null ? gain.hashCode() : 0);
+        result = 31 * result + (sustainLoop != null ? sustainLoop.hashCode() : 0);
+        result = 31 * result + (releaseLoop != null ? releaseLoop.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "InstrumentChunk{" +
                 "chunkId=" + chunkId +

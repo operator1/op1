@@ -8,6 +8,7 @@ import com.op1.iff.types.UnsignedLong;
 import com.op1.util.Check;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class SoundDataChunk implements Chunk {
 
@@ -29,6 +30,31 @@ public class SoundDataChunk implements Chunk {
         this.offset = chunk.getOffset();
         this.blockSize = chunk.getBlockSize();
         this.sampleData = chunk.getSampleData();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final SoundDataChunk that = (SoundDataChunk) o;
+
+        if (chunkId != null ? !chunkId.equals(that.chunkId) : that.chunkId != null) return false;
+        if (chunkSize != null ? !chunkSize.equals(that.chunkSize) : that.chunkSize != null) return false;
+        if (offset != null ? !offset.equals(that.offset) : that.offset != null) return false;
+        if (blockSize != null ? !blockSize.equals(that.blockSize) : that.blockSize != null) return false;
+        return Arrays.equals(sampleData, that.sampleData);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = chunkId != null ? chunkId.hashCode() : 0;
+        result = 31 * result + (chunkSize != null ? chunkSize.hashCode() : 0);
+        result = 31 * result + (offset != null ? offset.hashCode() : 0);
+        result = 31 * result + (blockSize != null ? blockSize.hashCode() : 0);
+        result = 31 * result + (sampleData != null ? Arrays.hashCode(sampleData) : 0);
+        return result;
     }
 
     @Override

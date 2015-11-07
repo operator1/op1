@@ -21,6 +21,10 @@ public class ComplianceCheck {
         this.problems = new ArrayList<>();
     }
 
+    /**
+     * @deprecated please use ComplianceCheck.enforceCompliance(Aiff) instead.
+     */
+    @Deprecated
     public void enforceCompliance() throws AiffNotCompliantException {
 
         checkComplianceOfFormChunk();
@@ -41,6 +45,10 @@ public class ComplianceCheck {
         }
     }
 
+    public static void enforceCompliance(Aiff aiff) throws AiffNotCompliantException {
+        new ComplianceCheck(aiff).enforceCompliance();
+    }
+
     private void checkComplianceOfFormChunk() {
 
         int physicalSizeOfDataPortion = 0;
@@ -56,6 +64,10 @@ public class ComplianceCheck {
         int expectedChunkSize = physicalSizeOfDataPortion;
         int expectedPhysicalSize = expectedChunkSize + 8;
 
+        if (expectedPhysicalSize % 2 == 1) {
+            expectedPhysicalSize++;
+        }
+
         checkChunkSizes(aiff, expectedChunkSize, expectedPhysicalSize);
     }
 
@@ -66,6 +78,10 @@ public class ComplianceCheck {
         int expectedChunkSize = chunk.getTimestamp().getSize();
         int expectedPhysicalSize = expectedChunkSize + 8;
 
+        if (expectedPhysicalSize % 2 == 1) {
+            expectedPhysicalSize++;
+        }
+
         checkChunkSizes(chunk, expectedChunkSize, expectedPhysicalSize);
     }
 
@@ -75,7 +91,11 @@ public class ComplianceCheck {
         final int applicationSignatureSize = chunk.getApplicationSignature().getSize();
         final int applicationDataSize = chunk.getData().length;
         final int expectedChunkSize = applicationSignatureSize + applicationDataSize;
-        final int expectedPhysicalSize = expectedChunkSize + 8;
+        int expectedPhysicalSize = expectedChunkSize + 8;
+
+        if (expectedPhysicalSize % 2 == 1) {
+            expectedPhysicalSize++;
+        }
 
         checkChunkSizes(chunk, expectedChunkSize, expectedPhysicalSize);
     }
@@ -98,6 +118,10 @@ public class ComplianceCheck {
 
         int expectedChunkSize = physicalSizeOfDataPortion % 2 == 0 ? physicalSizeOfDataPortion : physicalSizeOfDataPortion + 1;
         int expectedPhysicalSize = physicalSizeOfDataPortion + 8;
+
+        if (expectedPhysicalSize % 2 == 1) {
+            expectedPhysicalSize++;
+        }
 
         checkChunkSizes(chunk, expectedChunkSize, expectedPhysicalSize);
     }

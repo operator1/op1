@@ -18,10 +18,10 @@ public class DrumkitBuilderTool {
 
         final File startDirectory = new File(START_DIRECTORY);
         final File targetDirectory = new File("C:\\Temp");
-        final FileSystemSampleProvider fileSystemSampleProvider = new FileSystemSampleProvider(startDirectory, new WavOrDirectoryFilter());
-        final DrumkitBuilder drumkitBuilder = new DrumkitBuilder(fileSystemSampleProvider, targetDirectory);
+        final FileSystemTreeSampleProvider fileSystemTreeSampleProvider = new FileSystemTreeSampleProvider(startDirectory, new WavOrDirectoryFilter());
+        final DrumkitBuilder drumkitBuilder = new DrumkitBuilder(fileSystemTreeSampleProvider, targetDirectory);
 
-        drumkitBuilder.buildKits();
+        drumkitBuilder.buildKits("kit");
     }
 
     @Test
@@ -33,6 +33,6 @@ public class DrumkitBuilderTool {
                 "202cla03.wav", "202cla04.wav", "202cla05.wav", "202cla06.wav", "202cla07.wav", "202cla08.wav",
                 "202cla09.wav", "202cla10.wav", "202cla11.wav", "202cla12.wav");
 
-        new DrumkitBuilder(sampleProvider, new File("C:\\Temp")).buildKits();
+        new DrumkitBuilder(sampleProvider, new File("C:\\Temp")).buildKits("kit");
     }
 }

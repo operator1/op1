@@ -29,6 +29,27 @@ public class UnknownChunk implements Chunk {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final UnknownChunk that = (UnknownChunk) o;
+
+        if (chunkId != null ? !chunkId.equals(that.chunkId) : that.chunkId != null) return false;
+        if (chunkSize != null ? !chunkSize.equals(that.chunkSize) : that.chunkSize != null) return false;
+        return Arrays.equals(chunkData, that.chunkData);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = chunkId != null ? chunkId.hashCode() : 0;
+        result = 31 * result + (chunkSize != null ? chunkSize.hashCode() : 0);
+        result = 31 * result + (chunkData != null ? Arrays.hashCode(chunkData) : 0);
+        return result;
+    }
+
+    @Override
     public int getPhysicalSize() {
         return chunkId.getSize()
                 + chunkSize.getSize()

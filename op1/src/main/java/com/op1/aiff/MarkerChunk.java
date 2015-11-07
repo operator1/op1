@@ -32,6 +32,29 @@ public class MarkerChunk implements Chunk {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final MarkerChunk that = (MarkerChunk) o;
+
+        if (chunkId != null ? !chunkId.equals(that.chunkId) : that.chunkId != null) return false;
+        if (chunkSize != null ? !chunkSize.equals(that.chunkSize) : that.chunkSize != null) return false;
+        if (numMarkers != null ? !numMarkers.equals(that.numMarkers) : that.numMarkers != null) return false;
+        return !(markers != null ? !markers.equals(that.markers) : that.markers != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = chunkId != null ? chunkId.hashCode() : 0;
+        result = 31 * result + (chunkSize != null ? chunkSize.hashCode() : 0);
+        result = 31 * result + (numMarkers != null ? numMarkers.hashCode() : 0);
+        result = 31 * result + (markers != null ? markers.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "MarkerChunk{" +
                 "chunkId=" + chunkId +

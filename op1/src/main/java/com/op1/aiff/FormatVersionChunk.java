@@ -24,6 +24,27 @@ public class FormatVersionChunk implements Chunk {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final FormatVersionChunk that = (FormatVersionChunk) o;
+
+        if (chunkId != null ? !chunkId.equals(that.chunkId) : that.chunkId != null) return false;
+        if (chunkSize != null ? !chunkSize.equals(that.chunkSize) : that.chunkSize != null) return false;
+        return !(timestamp != null ? !timestamp.equals(that.timestamp) : that.timestamp != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = chunkId != null ? chunkId.hashCode() : 0;
+        result = 31 * result + (chunkSize != null ? chunkSize.hashCode() : 0);
+        result = 31 * result + (timestamp != null ? timestamp.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "FormatVersionChunk{" +
                 "chunkId=" + chunkId +

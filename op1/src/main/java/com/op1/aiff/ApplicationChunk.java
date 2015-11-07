@@ -20,13 +20,57 @@ public class ApplicationChunk implements Chunk {
     private OSType applicationSignature;                            // 4 bytes
     private SignedChar[] data;                                      // 1 byte per item
 
+    // TODO: this is totally wrong. This needs to be done in a generic way across all chunks.
+    private byte[] padBytes;                                        // 0 or 1 bytes
+
     private ApplicationChunk() {
     }
 
     private ApplicationChunk(ApplicationChunk chunk) {
+
         this.chunkSize = chunk.getChunkSize();
         this.applicationSignature = chunk.getApplicationSignature();
         this.data = Arrays.copyOf(chunk.getData(), chunk.getData().length);
+
+        int physicalSize = chunkId.getSize()
+                + chunkSize.getSize()
+                + applicationSignature.getSize();
+
+        for (SignedChar signedChar : data) {
+            physicalSize += signedChar.getSize();
+        }
+
+        if (physicalSize % 2 == 1) {
+            padBytes = new byte[]{0};
+        } else {
+            padBytes = new byte[0];
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final ApplicationChunk that = (ApplicationChunk) o;
+
+        if (!chunkId.equals(that.chunkId)) return false;
+        if (!chunkSize.equals(that.chunkSize)) return false;
+        if (!applicationSignature.equals(that.applicationSignature)) return false;
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        if (!Arrays.equals(data, that.data)) return false;
+        return Arrays.equals(padBytes, that.padBytes);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = chunkId.hashCode();
+        result = 31 * result + chunkSize.hashCode();
+        result = 31 * result + applicationSignature.hashCode();
+        result = 31 * result + Arrays.hashCode(data);
+        result = 31 * result + Arrays.hashCode(padBytes);
+        return result;
     }
 
     @Override
@@ -50,6 +94,8 @@ public class ApplicationChunk implements Chunk {
             size += signedChar.getSize();
         }
 
+        size += padBytes.length;
+
         return size;
     }
 
@@ -69,6 +115,14 @@ public class ApplicationChunk implements Chunk {
 
     public SignedChar[] getData() {
         return Arrays.copyOf(data, data.length);
+    }
+
+    public String getDataAsString() {
+        return SignedChar.getString(getData());
+    }
+
+    public byte[] getPadBytes() {
+        return padBytes;
     }
 
     public static class Builder {
@@ -110,6 +164,12 @@ public class ApplicationChunk implements Chunk {
         int numCharsToRead = (chunkSize.toInt() - 4);
         List<SignedChar> data = getApplicationData(reader, numCharsToRead);
         final SignedChar[] dataArray = data.toArray(new SignedChar[data.size()]);
+
+        // Chunks must be an even number of bytes in length. If the application data portion has an odd number
+        // of bytes, read and discard a pad byte.
+        if (numCharsToRead % 2 == 1) {
+            reader.readByte();
+        }
 
         return new ApplicationChunk.Builder()
                 .withChunkSize(chunkSize)

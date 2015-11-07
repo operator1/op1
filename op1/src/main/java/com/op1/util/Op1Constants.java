@@ -20,4 +20,6 @@ public class Op1Constants {
             .withChunkSize(SignedLong.fromInt(4))
             .withTimestamp(new UnsignedLong(new byte[]{-94, -128, 81, 64}))
             .build();
+
+    public static final int DRUMKIT_END = 2147483646;
 }
