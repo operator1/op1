@@ -51,7 +51,6 @@ public class IffReader implements Closeable {
         // Read the text bytes.
         final byte[] textBytes = readBytes(numTextBytes);
 
-
         // The total number of textBytes should be even. A pad byte may have been added to satisfy this rule.
         int numPadBytes = (numTextBytes + 1) % 2;
 

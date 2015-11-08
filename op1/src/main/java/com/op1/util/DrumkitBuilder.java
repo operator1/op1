@@ -115,7 +115,7 @@ public class DrumkitBuilder {
         final File targetFile = new File(targetDirectory, kitName + ".aif");
         try (AiffWriter aiffWriter = AiffWriter.newAiffWriter(targetFile)) {
             aiffWriter.writeAiff(aiff);
-            LOGGER.debug(String.format("Created kit of %s samples and length %s: %s", numSamples, bin.size(), targetFile.getAbsolutePath()));
+            LOGGER.debug(String.format("Created kit of %s samples and length %.2f seconds: %s", numSamples, bin.size(), targetFile.getAbsolutePath()));
         }
     }
 
@@ -271,8 +271,9 @@ public class DrumkitBuilder {
 
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
 
+        // TODO: Total crap that we're specifying the full jar name here.
         final Usage usage = Usage.newBuilder()
-                .programName("java -jar op1.jar")
+                .programName("java -jar op1-drumkit-1.0.0-SNAPSHOT.jar")
                 .mandatory("-source", "the root folder containing samples")
                 .mandatory("-target", "the target folder to write drumkits to")
                 .optional("-baseName", "the base name of the drumkit (numbers will be appended to this name)")

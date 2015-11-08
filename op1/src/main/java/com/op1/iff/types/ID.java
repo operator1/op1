@@ -12,6 +12,7 @@ public class ID extends DataType {
     private final String name;
 
     public ID(byte[] bytes) {
+        // TODO: ahem, validation?
         super(bytes, 4);
         this.name = new String(bytes);
     }
